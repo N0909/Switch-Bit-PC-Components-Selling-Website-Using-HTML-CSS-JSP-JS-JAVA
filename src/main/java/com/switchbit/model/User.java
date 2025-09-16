@@ -76,4 +76,16 @@ public class User {
 		this.userAddress = userAddress;
 	}
 	
+	public void setRegDate(Timestamp reg_date) {
+		this.reg_date = reg_date;
+	}
+
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", userName=" + userName + ", userEmail=" + userEmail + ", userPhone="
+				+ userPhone + ", userAddress=" + userAddress + ", reg_date=" + reg_date + "]";
+	}
+	
+	
+	
 }

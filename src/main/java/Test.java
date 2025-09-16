@@ -1,15 +1,33 @@
 import java.sql.*;
+import com.switchbit.util.*;
 
 import com.switchbit.dao.UserDAO;
+import com.switchbit.dto.UserWithPassword;
+import com.switchbit.exceptions.AuthenticationException;
+import com.switchbit.exceptions.DuplicateResourceException;
 import com.switchbit.model.*;
+import com.switchbit.service.UserService;
+import com.switchbit.util.PasswordUtil;
 
 public class Test {
+	
 	public static void main(String[] args) {
-		UserDAO userdao = new UserDAO();
-		User user = new User("USER001","TEST1","USER003@gmail.com","1234567890","DELHI",new Timestamp(System.currentTimeMillis()));
-		Password user_pass = new Password("USER001","7878908",new Timestamp(System.currentTimeMillis()));
-		userdao.addUser(user, user_pass);
-		System.out.println("Executed");
+		UserService service = new UserService();
+		
+		// "USR00001","N","meetnikhhil@gmail.com","8368872770","L-4/282",
+		
+		try {
+			
+			User user = service.verifyUser("8368872770", "7878908");
+			System.out.println(user.getUserName());
+			
+		} catch (AuthenticationException e) {
+			// TODO Auto-generated catch block
+			System.out.print(e);
+		}
+		
+		
+				
 	}
 
 }

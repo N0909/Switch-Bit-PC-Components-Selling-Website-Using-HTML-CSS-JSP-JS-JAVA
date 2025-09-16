@@ -4,4 +4,14 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+  	<servlet-name>UserSignUpServlet</servlet-name>
+  	<display-name>UserSignUpServlet</display-name>
+  	<servlet-class>com.switchbit.controller.user.UserSignUpServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>UserSignUpServlet</servlet-name>
+  	<url-pattern>/api/signup</url-pattern>
+  </servlet-mapping>
 </web-app>

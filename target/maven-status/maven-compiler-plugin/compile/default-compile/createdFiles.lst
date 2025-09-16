@@ -1,0 +1,11 @@
+com\switchbit\dao\UserDAO.class
+com\switchbit\model\Password.class
+com\switchbit\model\User.class
+Test.class
+com\switchbit\exceptions\DataAccessException.class
+com\switchbit\service\UserService.class
+com\switchbit\util\IdGeneratorDAO.class
+com\switchbit\util\PasswordUtil.class
+com\switchbit\util\DBConnection.class
+com\switchbit\util\MiscUtil.class
+com\switchbit\dto\UserWithPassword.class

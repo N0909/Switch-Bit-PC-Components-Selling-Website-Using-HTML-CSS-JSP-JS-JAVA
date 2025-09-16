@@ -1,58 +1,117 @@
 package com.switchbit.dao;
+
 // Importing classes from model and utils
 import com.switchbit.model.*;
+import com.switchbit.dto.UserWithPassword;
+import com.switchbit.exceptions.DataAccessException;
+import com.switchbit.exceptions.DuplicateResourceException;
 import com.switchbit.util.*;
 
 import java.sql.*;
 
 // This Class is responsible for Handling Users
 public class UserDAO {
-	
+
 	/**
 	 * DAO method to add a new User and their Password entry into the database.
-	 * Executes two stored procedures (addUser, addPassword) in a single transaction.
+	 * Executes two stored procedures (addUser, addPassword) in a single
+	 * transaction.
 	 */
-	public void addUser(User user, Password password) {
-	    // Use try-with-resources to auto-close DB connection
-	    try (Connection conn = DBConnection.getConnection();
-	         CallableStatement callableUser = conn.prepareCall("{call addUser(?, ?, ?, ?, ?, ?)}");
-	         CallableStatement callablePassword = conn.prepareCall("{call addPassword(?, ?, ?)}")) {
+	public void addUser(Connection conn, User user, Password password) throws SQLException {
+		// Use try-with-resources to auto-close DB connection
+		CallableStatement callableUser = conn.prepareCall("{call addUser(?, ?, ?, ?, ?, ?, ?, ?)}");
 
-	        // Start transaction
-	        conn.setAutoCommit(false);
+		// Set parameters for addUser procedure
+		callableUser.setString(1, user.getUserId());
+		callableUser.setString(2, user.getUserName());
+		callableUser.setString(3, user.getUserEmail());
+		callableUser.setString(4, user.getUserPhone());
+		callableUser.setString(5, user.getUserAddress());
+		callableUser.setTimestamp(6, user.getReg_date());
+		callableUser.setString(7, password.getPassword());
+		callableUser.setTimestamp(8, password.getLast_updated());
 
-	        // Set parameters for addUser procedure
-	        callableUser.setString(1, user.getUserId());
-	        callableUser.setString(2, user.getUserName());
-	        callableUser.setString(3, user.getUserEmail());
-	        callableUser.setString(4, user.getUserPhone());
-	        callableUser.setString(5, user.getUserAddress());
-	        callableUser.setTimestamp(6, user.getReg_date());
+		// Execute stored procedures
+		callableUser.execute();
+	}
 
-	        // Set parameters for addPassword procedure
-	        callablePassword.setString(1, password.getUser_id());
-	        callablePassword.setString(2, PasswordUtil.hashPassword(password.getPassword()));
-	        callablePassword.setTimestamp(3, password.getLast_updated());
+	/**
+	 * Fetches a User record based on a single identifier.
+	 * The identifier can be a phone number (all digits), an email (contains '@'),
+	 * or a user ID (fallback if it's neither phone nor email).
+	 *
+	 * Stored Procedures Used:
+	 *   - getUserByPhone
+	 *   - getUserByEmail
+	 *   - getUserByUserId
+	 *
+	 * @param conn current connection,identifier The user's phone, email, or ID.
+	 * @return User object if found, otherwise null.
+	 * @throws DataAccessException if database access fails.
+	 */
+	public UserWithPassword getUser(Connection conn,String identifier) throws SQLException{
+	    User user = null;
+	    Password password = null;
 
-	        // Execute stored procedures
-	        callableUser.execute();
-	        callablePassword.execute();
 
-	        // Commit transaction if both succeed
-	        conn.commit();
+	        CallableStatement callableUser;
 
-	    } catch (SQLException e) {
-	        // Log error
-	        System.err.println("Error adding user: " + e.getMessage());
-	        e.printStackTrace();
-	        try {
-	            // Attempt rollback if something failed
-	            Connection conn = DBConnection.getConnection();
-	            conn.rollback();
-	        } catch (SQLException rollbackEx) {
-	            System.err.println("Failed to rollback transaction: " + rollbackEx.getMessage());
+	        // 1️ Detect if the input is a phone number (all digits)
+	        if (identifier.matches("\\d+")) {
+	            callableUser = conn.prepareCall("{call getUserByPhone(?)}");
+	            callableUser.setString(1, identifier);
+
+	        // 2️ Detect if the input is an email (contains '@')
+	        } else if (identifier.contains("@")) {
+	            callableUser = conn.prepareCall("{call getUserByEmail(?)}");
+	            callableUser.setString(1, identifier);
+
+	        // 3️ Otherwise, treat it as a user ID
+	        } else {
+	            callableUser = conn.prepareCall("{call getUserById(?)}");
+	            callableUser.setString(1, identifier);
 	        }
-	    }
+
+	        // Execute the procedure and map the result set
+	        ResultSet rs = callableUser.executeQuery();
+	         if (rs.next()) {
+	                user = new User(
+	                        rs.getString("user_id"),
+	                        rs.getString("name"),
+	                        rs.getString("email"),
+	                        rs.getString("phone"),
+	                        rs.getString("address"),
+	                        rs.getTimestamp("reg_date")
+	                );
+	                password = new Password(
+	                		rs.getString("user_id"),
+	                		rs.getString("password_hash"),
+	                		rs.getTimestamp("last_updated")
+	                );
+	            }
+	    return new UserWithPassword(user, password);
+	}
+
+	/**
+	 * Update a user record based on user object
+	 * 
+	 * Store Procedure Used updateUser
+	 * 
+	 * @param user, conn
+	 * @return void
+	 * @throws DataAccessException if database access fails.
+	 */
+	public void updateUser(Connection conn, User user) throws SQLException {
+		CallableStatement updateuser = conn.prepareCall("{call updateUser(?, ?, ?, ?, ?)}");
+		// Setting UpdateUser Procedure parameters
+		updateuser.setString(1, user.getUserId());
+		updateuser.setString(2, user.getUserName());
+		updateuser.setString(3, user.getUserEmail());
+		updateuser.setString(4, user.getUserPhone());
+		updateuser.setString(5, user.getUserAddress());
+
+		// Executing Procedure
+		updateuser.execute();
 	}
 
 }
