@@ -9,9 +9,49 @@
   	<display-name>UserSignUpServlet</display-name>
   	<servlet-class>com.switchbit.controller.user.UserSignUpServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>UserLoginServlet</servlet-name>
+  	<display-name>UserLoginServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.user.UserLoginServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>UserLogoutServlet</servlet-name>
+  	<display-name>UserLogoutServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.user.UserLogoutServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>UserUpdateServlet</servlet-name>
+  	<display-name>UserUpdateServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.user.UserUpdateServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>UpdatePasswordServlet</servlet-name>
+  	<display-name>UpdatePasswordServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.user.UpdatePasswordServlet</servlet-class>
+  </servlet>
   
   <servlet-mapping>
   	<servlet-name>UserSignUpServlet</servlet-name>
-  	<url-pattern>/api/signup</url-pattern>
+  	<url-pattern>/user/signup</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>UserLoginServlet</servlet-name>
+  	<url-pattern>/user/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>UserLogoutServlet</servlet-name>
+  	<url-pattern>/user/logout</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>UserUpdateServlet</servlet-name>
+  	<url-pattern>/user/update</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>UpdatePasswordServlet</servlet-name>
+  	<url-pattern>/user/updatepassword</url-pattern>
   </servlet-mapping>
 </web-app>

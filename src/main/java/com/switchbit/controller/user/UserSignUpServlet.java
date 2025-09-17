@@ -57,13 +57,8 @@ public class UserSignUpServlet extends HttpServlet {
             // 4. Call service to add user
             User createdUser = userService.addUser(user, password);
 
-            // 5. Store in session
-            HttpSession session = request.getSession();
-            session.setAttribute("user", createdUser);
-
-            // 6. Redirect to success page
-            response.sendRedirect(request.getContextPath() + "/sign-up-success.jsp");
-
+            // 5. Redirect to login page
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
         }
         catch (DuplicateResourceException e) {
         	request.setAttribute("errorMessage", "Email or Phone already exists");

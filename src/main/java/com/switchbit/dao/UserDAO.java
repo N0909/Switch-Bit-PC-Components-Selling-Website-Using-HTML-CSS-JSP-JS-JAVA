@@ -18,21 +18,22 @@ public class UserDAO {
 	 * transaction.
 	 */
 	public void addUser(Connection conn, User user, Password password) throws SQLException {
-		// Use try-with-resources to auto-close DB connection
-		CallableStatement callableUser = conn.prepareCall("{call addUser(?, ?, ?, ?, ?, ?, ?, ?)}");
+		try(CallableStatement callableUser = conn.prepareCall("{call addUser(?, ?, ?, ?, ?, ?, ?, ?)}");){
+			
 
-		// Set parameters for addUser procedure
-		callableUser.setString(1, user.getUserId());
-		callableUser.setString(2, user.getUserName());
-		callableUser.setString(3, user.getUserEmail());
-		callableUser.setString(4, user.getUserPhone());
-		callableUser.setString(5, user.getUserAddress());
-		callableUser.setTimestamp(6, user.getReg_date());
-		callableUser.setString(7, password.getPassword());
-		callableUser.setTimestamp(8, password.getLast_updated());
+			// Set parameters for addUser procedure
+			callableUser.setString(1, user.getUserId());
+			callableUser.setString(2, user.getUserName());
+			callableUser.setString(3, user.getUserEmail());
+			callableUser.setString(4, user.getUserPhone());
+			callableUser.setString(5, user.getUserAddress());
+			callableUser.setTimestamp(6, user.getReg_date());
+			callableUser.setString(7, password.getPassword());
+			callableUser.setTimestamp(8, password.getLast_updated());
 
-		// Execute stored procedures
-		callableUser.execute();
+			// Execute stored procedures
+			callableUser.execute();
+		}
 	}
 
 	/**
@@ -46,13 +47,12 @@ public class UserDAO {
 	 *   - getUserByUserId
 	 *
 	 * @param conn current connection,identifier The user's phone, email, or ID.
-	 * @return User object if found, otherwise null.
-	 * @throws DataAccessException if database access fails.
+	 * @throws SQLException
+	 * @return UserWithPassword object.
 	 */
 	public UserWithPassword getUser(Connection conn,String identifier) throws SQLException{
 	    User user = null;
 	    Password password = null;
-
 
 	        CallableStatement callableUser;
 
@@ -97,21 +97,47 @@ public class UserDAO {
 	 * 
 	 * Store Procedure Used updateUser
 	 * 
-	 * @param user, conn
+	 * @param user, conn Connection
 	 * @return void
-	 * @throws DataAccessException if database access fails.
+	 * @throws SQLException
 	 */
 	public void updateUser(Connection conn, User user) throws SQLException {
-		CallableStatement updateuser = conn.prepareCall("{call updateUser(?, ?, ?, ?, ?)}");
-		// Setting UpdateUser Procedure parameters
-		updateuser.setString(1, user.getUserId());
-		updateuser.setString(2, user.getUserName());
-		updateuser.setString(3, user.getUserEmail());
-		updateuser.setString(4, user.getUserPhone());
-		updateuser.setString(5, user.getUserAddress());
+		
+		try(CallableStatement updateuser = conn.prepareCall("{call updateUser(?, ?, ?, ?, ?)}");){
+			
+			// Setting UpdateUser Procedure parameters
+			updateuser.setString(1, user.getUserId());
+			updateuser.setString(2, user.getUserName());
+			updateuser.setString(3, user.getUserEmail());
+			updateuser.setString(4, user.getUserPhone());
+			updateuser.setString(5, user.getUserAddress());
 
-		// Executing Procedure
-		updateuser.execute();
+			// Executing Procedure
+			updateuser.execute();
+		}
 	}
+	
+	/**
+	 * update the user password
+	 * 
+	 * @param conn - Database Connection
+	 * @param password - password object 
+	 * @throws SQLException
+	 */
+	public void updatePassword(Connection conn, Password password) throws SQLException {
+		try(CallableStatement updatePassword =  conn.prepareCall("{call updatePassword (?, ?, ?)}");){
+			
+			// Setting updatePassword procedure parameters
+			updatePassword.setString(1, password.getUser_id());		
+			updatePassword.setString(2, password.getPassword());
+			updatePassword.setTimestamp(3, password.getLast_updated());
+		
+		
+			// Executing Procedure
+			updatePassword.execute();
+		}
+	}
+	
+	
 
 }

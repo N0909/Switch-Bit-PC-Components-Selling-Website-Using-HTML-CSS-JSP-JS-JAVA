@@ -11,7 +11,7 @@
     
     <p style="color:red;"><%= request.getAttribute("errorMessage") %></p>
 
-    <form action="<%= request.getContextPath() %>/api/signup" method="post">
+    <form action="<%= request.getContextPath() %>/user/signup" method="post">
         <label>Name:</label>
         <input type="text" name="user-name" required><br><br>
 

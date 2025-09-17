@@ -110,14 +110,14 @@ public class UserService {
 	 * @return User object if authentication succeeds
 	 * @throws AuthenticationException
 	 */
-	public User verifyUser(String identifier, String password) throws AuthenticationException {
+	public User verifyUser(String identifier, String password) throws AuthenticationException, InvalidUserException {
 
 		try {
 			Connection conn = DBConnection.getConnection();
 			UserWithPassword uwp = userDAO.getUser(conn, identifier);
 
 			if (uwp.getUser() == null) {
-				throw new AuthenticationException("Invalid User with identifier: " + identifier);
+				throw new InvalidUserException("Invalid User with identifier: " + identifier);
 			}
 
 			String hashPassword = PasswordUtil.hashPassword(password);
@@ -182,5 +182,67 @@ public class UserService {
 		}
 		return updatedUser;
 	}
+	
+	/**
+	 * Updates a user's password if the old password is correct.
+	 *
+	 * @param oldPassword  The user's current (raw) password entered for verification.
+	 * @param newPassword  A Password object containing the userId, new hashed password, and updated date.
+	 * @throws AuthenticationException if the old password does not match.
+	 * @throws DataAccessException if any database error occurs.
+	 */
+	public void updatePassword(String oldPassword, Password newPassword) throws AuthenticationException {
+	    Connection conn = null;
+
+	    try {
+	        conn = DBConnection.getConnection();
+	        conn.setAutoCommit(false);
+
+	        // 1. Fetch the existing password object for this user
+	        Password existingPassword = userDAO
+	                .getUser(conn, newPassword.getUser_id())
+	                .getPassword();
+
+	        // 2. Verify the old password
+	        boolean valid = PasswordUtil.verifyPassword(oldPassword, existingPassword.getPassword());
+
+	        if (valid) {
+	        	// Hash the new Password
+		    	String newHashedPassword = PasswordUtil.hashPassword(newPassword.getPassword());
+		    	newPassword.setPassword(newHashedPassword);
+	            // 3. Update password
+	            userDAO.updatePassword(conn, newPassword);
+
+	            // 4. Commit transaction
+	            conn.commit();
+	        } else {
+	            throw new AuthenticationException("Invalid current password. Try again.");
+	        }
+
+	    } catch (SQLException e) {
+	        // Rollback in case of DB error
+	        if (conn != null) {
+	            try { conn.rollback(); } 
+	            catch (SQLException rollbackEx) {
+	                throw new DataAccessException("Failed to rollback transaction", rollbackEx);
+	            }
+	        }
+	        throw new DataAccessException("Failed to update password", e);
+
+	    } finally {
+	        // Always clean up
+	        if (conn != null) {
+	            try {
+	                conn.setAutoCommit(true); // restore auto-commit
+	                conn.close();
+	            } catch (SQLException ex) {
+	                throw new DataAccessException("Failed to close connection", ex);
+	            }
+	        }
+	    }
+	}
+
+	
+	
 
 }
