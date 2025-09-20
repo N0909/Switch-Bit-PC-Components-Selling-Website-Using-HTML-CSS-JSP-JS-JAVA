@@ -7,8 +7,10 @@ import jakarta.servlet.annotation.*;
 
 import java.sql.*;
 
+import com.switchbit.exceptions.CloseConnectionException;
 import com.switchbit.exceptions.DataAccessException;
 import com.switchbit.exceptions.DuplicateResourceException;
+import com.switchbit.exceptions.RollBackException;
 import com.switchbit.model.*;
 import com.switchbit.service.UserService;
 
@@ -69,7 +71,11 @@ public class UserSignUpServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Failed to register user. Try again.");
 //            request.getRequestDispatcher("/signup.jsp").forward(request, response);
             response.getWriter().println(e);
-        }
+        } catch (RollBackException e) {
+			e.printStackTrace();
+		} catch (CloseConnectionException e) {
+			e.printStackTrace();
+		}
     }
 }
 

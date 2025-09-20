@@ -35,7 +35,7 @@ public class UserService {
 	 * @return The persisted User with its assigned ID.
 	 * @throws DuplicateResourceException
 	 */
-	public User addUser(User user, String rawPassword) throws DuplicateResourceException {
+	public User addUser(User user, String rawPassword) throws DuplicateResourceException,DataAccessException,RollBackException, CloseConnectionException {
 		Connection conn = null;
 
 		try {
@@ -43,10 +43,10 @@ public class UserService {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false); // begin transaction
 
+			
 			// 2. Generate next user ID (based on sequence table, but not updated yet)
-			String nextId = MiscUtil.idGenerator("USR00000", IdGeneratorDAO.getCurrentIdVal("USER") + 1 // preview next
-																										// ID
-			);
+			int currentId = IdGeneratorDAO.getCurrentIdVal(conn,"USER");
+			String nextId = MiscUtil.idGenerator("USR00000", currentId);
 
 			// 3. Securely hash the password
 			String hashedPassword = PasswordUtil.hashPassword(rawPassword);
@@ -61,7 +61,7 @@ public class UserService {
 			userDAO.addUser(conn, user, password);
 
 			// 7. Now that user insert succeeded, advance the sequence
-			IdGeneratorDAO.setNextIdVal(conn, "USER");
+			IdGeneratorDAO.setNextIdVal(conn, "USER", currentId);
 
 			// 8. Commit transaction (both inserts + sequence update succeed)
 			conn.commit();
@@ -72,7 +72,7 @@ public class UserService {
 				try {
 					conn.rollback();
 				} catch (SQLException ex) {
-					throw new DataAccessException("Failed to rollback transaction", ex);
+					throw new RollBackException("Failed to rollback transaction", ex);
 				}
 			}
 
@@ -89,7 +89,7 @@ public class UserService {
 					conn.setAutoCommit(true); // restore autocommit
 					conn.close();
 				} catch (SQLException ex) {
-					throw new DataAccessException("Failed to clean up connection", ex);
+					throw new CloseConnectionException("Failed to clean up connection", ex);
 				}
 			}
 		}
@@ -110,7 +110,7 @@ public class UserService {
 	 * @return User object if authentication succeeds
 	 * @throws AuthenticationException
 	 */
-	public User verifyUser(String identifier, String password) throws AuthenticationException, InvalidUserException {
+	public User verifyUser(String identifier, String password) throws AuthenticationException, InvalidUserException, DataAccessException {
 
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -143,7 +143,7 @@ public class UserService {
 	 * @param user User object with updated fields (must contain userId).
 	 * @return Updated user object (fresh from DB if needed).
 	 */
-	public User updateUser(User user) throws DuplicateResourceException {
+	public User updateUser(User user) throws DuplicateResourceException, DataAccessException, RollBackException, CloseConnectionException {
 		User updatedUser = null;
 		Connection conn = null;
 		try {
@@ -162,7 +162,7 @@ public class UserService {
 				try {
 					conn.rollback();
 				} catch (SQLException ex) {
-					throw new DataAccessException("Failed to rollback transaction during user update", ex);
+					throw new RollBackException("Failed to rollback transaction during user update", ex);
 				}
 			}
 
@@ -176,7 +176,7 @@ public class UserService {
 					conn.setAutoCommit(true);
 					conn.close();
 				} catch (SQLException e) {
-					throw new DataAccessException("Failed to cleanup Connection after updateUser", e);
+					throw new CloseConnectionException("Failed to cleanup Connection after updateUser", e);
 				}
 			}
 		}
@@ -191,7 +191,7 @@ public class UserService {
 	 * @throws AuthenticationException if the old password does not match.
 	 * @throws DataAccessException if any database error occurs.
 	 */
-	public void updatePassword(String oldPassword, Password newPassword) throws AuthenticationException {
+	public void updatePassword(String oldPassword, Password newPassword) throws AuthenticationException, DataAccessException, RollBackException, CloseConnectionException {
 	    Connection conn = null;
 
 	    try {
@@ -224,7 +224,7 @@ public class UserService {
 	        if (conn != null) {
 	            try { conn.rollback(); } 
 	            catch (SQLException rollbackEx) {
-	                throw new DataAccessException("Failed to rollback transaction", rollbackEx);
+	                throw new RollBackException("Failed to rollback transaction", rollbackEx);
 	            }
 	        }
 	        throw new DataAccessException("Failed to update password", e);
@@ -236,7 +236,7 @@ public class UserService {
 	                conn.setAutoCommit(true); // restore auto-commit
 	                conn.close();
 	            } catch (SQLException ex) {
-	                throw new DataAccessException("Failed to close connection", ex);
+	                throw new CloseConnectionException("Failed to close connection", ex);
 	            }
 	        }
 	    }

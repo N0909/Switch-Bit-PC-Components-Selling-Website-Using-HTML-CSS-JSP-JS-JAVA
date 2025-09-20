@@ -33,6 +33,50 @@
   	<description></description>
   	<servlet-class>com.switchbit.controller.user.UpdatePasswordServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>ProductListServlet</servlet-name>
+  	<display-name>ProductListServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.product.ProductListServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>SearchProductListServlet</servlet-name>
+  	<display-name>SearchProductListServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.product.SearchProductListServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>GetProductServlet</servlet-name>
+  	<display-name>GetProductServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.product.GetProductServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>ProductByCategoryServlet</servlet-name>
+  	<display-name>ProductByCategoryServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.product.ProductByCategoryServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>GetCategoryServlet</servlet-name>
+  	<display-name>GetCategoryServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.product.GetCategoryServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>HomeController</servlet-name>
+  	<display-name>HomeController</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.HomeController</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>RootRedirectServlet</servlet-name>
+  	<display-name>RootRedirectServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.RootRedirectServlet</servlet-class>
+  </servlet>
+  
+ 
   
   <servlet-mapping>
   	<servlet-name>UserSignUpServlet</servlet-name>
@@ -54,4 +98,33 @@
   	<servlet-name>UpdatePasswordServlet</servlet-name>
   	<url-pattern>/user/updatepassword</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>ProductListServlet</servlet-name>
+  	<url-pattern>/product/products</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>SearchProductListServlet</servlet-name>
+  	<url-pattern>/product/searchproduct</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>GetProductServlet</servlet-name>
+  	<url-pattern>/product/getProduct</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>ProductByCategoryServlet</servlet-name>
+  	<url-pattern>/product/productBycategory</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>GetCategoryServlet</servlet-name>
+  	<url-pattern>/product/category</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>HomeController</servlet-name>
+  	<url-pattern>/home</url-pattern>
+  </servlet-mapping>
+ 
+  <welcome-file-list>
+        <welcome-file>HomeController</welcome-file>
+   </welcome-file-list>
+  
 </web-app>

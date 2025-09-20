@@ -12,7 +12,9 @@ import jakarta.servlet.http.HttpSession;
 import com.switchbit.service.UserService;
 import com.switchbit.model.User;
 import com.switchbit.exceptions.AuthenticationException;
+import com.switchbit.exceptions.CloseConnectionException;
 import com.switchbit.exceptions.DataAccessException;
+import com.switchbit.exceptions.RollBackException;
 import com.switchbit.model.Password;
 /**
  * Servlet implementation class UpdatePasswordServlet
@@ -71,7 +73,13 @@ public class UpdatePasswordServlet extends HttpServlet {
 	        // DB failure
 	        request.setAttribute("errorMessage", "Failed to update password. Please try later.");
 	        request.getRequestDispatcher("/change-password.jsp").forward(request, response);
-	    }
+	    } catch (RollBackException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CloseConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 

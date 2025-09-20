@@ -2,8 +2,10 @@ package com.switchbit.controller.user;
 
 import java.io.IOException;
 
+import com.switchbit.exceptions.CloseConnectionException;
 import com.switchbit.exceptions.DataAccessException;
 import com.switchbit.exceptions.DuplicateResourceException;
+import com.switchbit.exceptions.RollBackException;
 import com.switchbit.model.User;
 import com.switchbit.service.UserService;
 
@@ -65,6 +67,12 @@ public class UserUpdateServlet extends HttpServlet {
         } catch (DataAccessException e) {
             request.setAttribute("errorMessage", "Failed to update user. Please try again.");
             request.getRequestDispatcher("/update-user.jsp").forward(request, response);
-        }
+        } catch (RollBackException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CloseConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }	

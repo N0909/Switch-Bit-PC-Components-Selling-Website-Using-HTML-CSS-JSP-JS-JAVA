@@ -5,6 +5,6 @@ public class InvalidUserException extends Exception{
 		super(message);
 	}
 	public InvalidUserException(String message, Throwable cause) {
-		super(message, cause)
+		super(message, cause);
 	}
 }
