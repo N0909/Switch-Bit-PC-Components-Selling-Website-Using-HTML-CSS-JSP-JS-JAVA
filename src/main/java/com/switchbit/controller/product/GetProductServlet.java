@@ -36,10 +36,10 @@ public class GetProductServlet extends HttpServlet {
 		try {
 			Product product = service.getProduct(product_id);
 			request.setAttribute("product", product);
-			request.getRequestDispatcher("/productDetails.jsp").forward(request, response);
+			request.getRequestDispatcher("/product-details.jsp").forward(request, response);
 		}catch(DataAccessException e) {
 			request.setAttribute("errorMessage", "failed to retreive product");
-			request.getRequestDispatcher("/productDetails.jsp").forward(request, response);
+			request.getRequestDispatcher("/product-details.jsp").forward(request, response);
 		}
 		
 	}

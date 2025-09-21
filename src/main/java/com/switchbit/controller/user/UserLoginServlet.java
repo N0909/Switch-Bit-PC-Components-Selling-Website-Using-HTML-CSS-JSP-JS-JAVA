@@ -42,31 +42,40 @@ public class UserLoginServlet extends HttpServlet {
         String password = request.getParameter("user-password");
 
         try {
+        	
+        	String referer = request.getHeader("referer");
+        	
             // 2. Verify user using service
             User user = userService.verifyUser(identifier, password);
+            
+            
 
             // 3. If verified, create session and store user
             HttpSession session = request.getSession(false);
             if (session!=null)
             	session.setAttribute("user", user);
 
+            if (referer!=null) {
+            	response.sendRedirect(referer);
+            }else {
+            	response.sendRedirect(request.getContextPath()+"/home");
+            }
             // 4. Redirect to success/dashboard page
-            response.sendRedirect(request.getContextPath() + "/login-success.jsp");
 
         } catch (InvalidUserException e) {
             // User not found
             request.setAttribute("errorMessage", "No user found with: " + identifier);
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/signin.jsp").forward(request, response);
 
         } catch (AuthenticationException e) {
             // Password invalid
             request.setAttribute("errorMessage", "Invalid password. Try again.");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/signin.jsp").forward(request, response);
 
         } catch (DataAccessException e) {
             // DB/connection error
             request.setAttribute("errorMessage", "Internal error. Please try again later.");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/signin.jsp").forward(request, response);
         }
     }
 }

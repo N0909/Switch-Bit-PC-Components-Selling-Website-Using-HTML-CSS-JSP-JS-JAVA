@@ -69,12 +69,12 @@
         <% if (user != null) { %>
         <div class="cart-container">
           <div class="side-icon">
-            <img width="20px" src="icons/shopping-cart.png" alt="c" />
+            <img width="20px" src="<%=request.getContextPath() %>/icons/shopping-cart.png" alt="c" />
           </div>
         </div>
         <div class="account-container">
           <div class="side-icon profile-trigger">
-            <img width="20px" src="icons/profile-icon.png" alt="Profile" />
+            <img width="20px" src="<%=request.getContextPath() %>/icons/profile-icon.png" alt="Profile" />
           </div>
           <div class="profile-dropdown">
             <div class="dropdown-item">
@@ -112,7 +112,7 @@
                 </div>
                 <div class="product-details">
                   <div class="product-info">
-                    <h3 class="product-title"><%= product.getProduct_name() %></h3>
+                    <a style="text-decoration:none" href="<%=request.getContextPath()%>/product/getProduct?product-id=<%=product.getProduct_id()%>"><h3 class="product-title"><%= product.getProduct_name() %></h3></a>
                     <p class="product-description"><%= product.getDescription() %></p>
                   </div>
                   <div class="product-actions">

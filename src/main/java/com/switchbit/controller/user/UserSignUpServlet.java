@@ -60,7 +60,7 @@ public class UserSignUpServlet extends HttpServlet {
             User createdUser = userService.addUser(user, password);
 
             // 5. Redirect to login page
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/signin.jsp");
         }
         catch (DuplicateResourceException e) {
         	request.setAttribute("errorMessage", "Email or Phone already exists");
@@ -69,8 +69,7 @@ public class UserSignUpServlet extends HttpServlet {
         catch (DataAccessException e) {
             // Handle DB errors
             request.setAttribute("errorMessage", "Failed to register user. Try again.");
-//            request.getRequestDispatcher("/signup.jsp").forward(request, response);
-            response.getWriter().println(e);
+            request.getRequestDispatcher("/signup.jsp").forward(request, response);
         } catch (RollBackException e) {
 			e.printStackTrace();
 		} catch (CloseConnectionException e) {

@@ -98,15 +98,16 @@
             <% for (int i = 0; i < Math.min(5, products.size()); i++) { %>
               <% Product product = products.get(i); %>
               <div class="product-card">
-                <div class="product-img">
-                  <img
-                    width="100px"
-                    src="<%= request.getContextPath() %>/<%= product.getProduct_img() %>"
-                    alt="<%= product.getProduct_name() %>"
-                  />
-                </div>
-                <div class="product-name"><%= product.getProduct_name() %></div>
-                <div class="price">₹ <%= product.getPrice() %></div>
+              	
+	                <div class="product-img">
+	                  <img
+	                    width="100px"
+	                    src="<%= request.getContextPath() %>/<%= product.getProduct_img() %>"
+	                    alt="<%= product.getProduct_name() %>"
+	                  />
+	                </div>
+	                <a style="text-decoration:none;" href="<%=request.getContextPath()%>/product/getProduct?product-id=<%=product.getProduct_id()%>"><div class="product-name"><%= product.getProduct_name() %></div></a>
+	                <div class="price">₹<%= product.getPrice() %></div>
                 <div class="buttons">
                   <button onclick="buyNow('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Buy Now</button>
                   <% if (user != null) { %>
@@ -134,7 +135,7 @@
                 <div class="category-img">
                   <img src="<%= request.getContextPath() %>/<%= category.getCategory_image() %>" alt="<%= category.getCategory_name() %>" />
                 </div>
-                <div class="category-name"><%= category.getCategory_name() %></div>
+                <a style="text-decoration:none;" href="<%=request.getContextPath()%>/product/productBycategory?category-id=<%=category.getCategory_id()%>"><div class="product-name"><%= category.getCategory_name() %></div></a>
               </div>
             <% } %>
           <% } %>
@@ -225,7 +226,7 @@
                 window.location.href = '<%= request.getContextPath() %>/account.jsp';
               } else if (text === 'Logout') {
                 if (confirm('Are you sure you want to logout?')) {
-                  window.location.href = '<%= request.getContextPath() %>/logout';
+                  window.location.href = '<%= request.getContextPath() %>/user/logout';
                 }
               }
               
@@ -237,47 +238,8 @@
           });
         }
         <% } %>
-
-        // Product card interactions
-        const buyNowButtons = document.querySelectorAll('.btn-buy-now');
-        const addToCartButtons = document.querySelectorAll('.btn-add-cart');
-
-        buyNowButtons.forEach(button => {
-          button.addEventListener('click', function() {
-            const productTitle = this.closest('.product-card').querySelector('.product-name').textContent;
-            alert(`Proceeding to checkout for: ${productTitle}`);
-            // Add your buy now logic here
-          });
-        });
-
-        addToCartButtons.forEach(button => {
-          button.addEventListener('click', function() {
-            const productTitle = this.closest('.product-card').querySelector('.product-name').textContent;
-            alert(`${productTitle} added to cart!`);
-            // Add your add to cart logic here
-          });
-        });
       });
 
-      // Function to handle buy now
-      function buyNow(productId, productName) {
-        alert(`Proceeding to checkout for: ${productName}`);
-        // Add your buy now logic here
-        // window.location.href = '<%= request.getContextPath() %>/checkout.jsp?productId=' + productId;
-      }
-
-      // Function to handle add to cart
-      function addToCart(productId, productName) {
-        alert(`${productName} added to cart!`);
-        // Add your add to cart logic here
-        // You can make an AJAX call to add to cart
-      }
-
-      // Function to show login alert for non-logged in users
-      function showLoginAlert() {
-        alert('Please login to add items to cart');
-        window.location.href = '<%= request.getContextPath() %>/signin.jsp';
-      }
     </script>
   </body>
 </html>

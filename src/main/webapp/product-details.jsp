@@ -1,29 +1,44 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="com.switchbit.model.*" %>
+<%
+    // Get session user
+    User user = (User) session.getAttribute("user");
+	Product product = (Product) request.getAttribute("product");
+%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Details - SwitchBit</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="<%=request.getContextPath() %>/css/style.css" />
   </head>
   <body>
     <div class="page-container">
     <div class="header">
       <div class="company-logo">
         <div class="logo">
-          <img width="30px" src="icons/mouse.png" alt="" />
+          <img width="30px" src="<%=request.getContextPath() %>/icons/mouse.png" alt="" />
         </div>
         <div class="title">SwitchBit</div>
       </div>
 
       <div class="nav">
         <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="">About</a></li>
-          <li><a href="signup.html">Sign Up</a></li>
-          <li><a href="signin.html">Sign In</a></li>
-          <li><a href="products.html">Products</a></li>
-          <li><a href="">Contact</a></li>
+          <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
+          <li><a href="<%=request.getContextPath()%>/about.jsp">About</a></li>
+          <%
+          	if (user==null){
+          		
+          %>
+          <li><a href="<%=request.getContextPath()%>/signup.jsp">Sign Up</a></li>
+          <li><a href="<%=request.getContextPath()%>/signin.jsp">Sign In</a></li>
+          <%
+          	}
+          %>
+          <li><a href="<%=request.getContextPath()%>/product/products">Products</a></li>
+          <li><a href="<%=request.getContextPath()%>/contact.jsp">Contact</a></li>
         </ul>
       </div>
 
@@ -37,18 +52,21 @@
               class="search-field"
             />
             <button class="search-btn" type="submit">
-              <img width="16px" src="icons/search-interface-symbol.png" alt="Search" />
+              <img width="16px" src="<%=request.getContextPath() %>/icons/search-interface-symbol.png" alt="Search" />
             </button>
           </div>
         </div>
+        <%
+        if (user!=null){
+        %>
         <div class="cart-container">
           <div class="side-icon">
-            <img width="20px" src="icons/shopping-cart.png" alt="c" />
+            <img width="20px" src="<%=request.getContextPath() %>/icons/shopping-cart.png" alt="c" />
           </div>
         </div>
         <div class="account-container">
           <div class="side-icon profile-trigger">
-            <img width="20px" src="icons/profile-icon.png" alt="Profile" />
+            <img width="20px" src="<%=request.getContextPath() %>/icons/profile-icon.png" alt="Profile" />
           </div>
           <div class="profile-dropdown">
             <div class="dropdown-item">
@@ -66,6 +84,9 @@
             </div>
           </div>
         </div>
+        <%
+        	}
+        %>
       </div>
     </div>
 
@@ -73,39 +94,34 @@
       <div class="product-details-page">
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-          <a href="index.html">Home</a>
+          <a href="<%=request.getContextPath() %>/home">Home</a>
           <span class="breadcrumb-separator">></span>
-          <a href="products.html">Products</a>
+          <a href="<%=request.getContextPath() %>/product/products">Products</a>
           <span class="breadcrumb-separator">></span>
-          <span class="breadcrumb-current">Product Details</span>
+          <span class="breadcrumb-current"><%=product.getProduct_name() %></span>
         </div>
 
         <div class="product-details-container">
           <div class="product-image-section">
             <div class="main-image">
-              <img src="images/Products/CPU/Intel Core i9-13900K.jpg" alt="Intel Core i9-13900K" />
+              <img src="<%=request.getContextPath() %>/<%=product.getProduct_img()%>" alt="<%=product.getProduct_name() %>>" />
             </div>
             </div>
           </div>
 
           <div class="product-info-section">
             <div class="product-header">
-              <h1 class="product-title">Intel Core i9-13900K</h1>
-              <div class="product-category">CPU / Processors</div>
+              <h1 class="product-title"><%=product.getProduct_name() %></h1>
+              <div class="product-category"><%=product.getCategory().getCategory_name() %></div>
             </div>
 
             <div class="product-price">
-              <span class="current-price">₹38,000</span>
+              <span class="current-price">₹<%=product.getPrice() %></span>
             </div>
 
             <div class="product-description">
               <h3>Description</h3>
-              <p>
-                The Intel Core i9-13900K is a high-performance 13th generation processor that delivers exceptional computing power for gaming, content creation, and professional workloads. Built with Intel's advanced 10nm process technology, this processor features 24 cores and 32 threads, providing incredible multi-tasking capabilities.
-              </p>
-              <p>
-                Perfect for gamers, content creators, and professionals who demand the best performance. The i9-13900K offers outstanding single-core and multi-core performance, making it ideal for gaming, video editing, 3D rendering, and other intensive applications.
-              </p>
+              <p><%=product.getDescription() %></p>
             </div>
 
 
@@ -135,14 +151,14 @@
                   </div>
                 </div>
                 <div class="shipping-item">
-                  <span class="shipping-icon">🔄</span>
+                  <span class="shipping-icon">🔄</span>
                   <div class="shipping-text">
                     <strong>Easy Returns</strong>
                     <p>30-day return policy</p>
                   </div>
                 </div>
                 <div class="shipping-item">
-                  <span class="shipping-icon">🛡️</span>
+                  <span class="shipping-icon">🛡️</span>
                   <div class="shipping-text">
                     <strong>Warranty</strong>
                     <p>3-year manufacturer warranty</p>
@@ -192,8 +208,14 @@
     </div>
     
     <script>
+      
+   
       // Profile dropdown functionality
       document.addEventListener('DOMContentLoaded', function() {
+    	  
+    	<%
+      		if (user!=null){
+      	%>
         const profileTrigger = document.querySelector('.profile-trigger');
         const profileDropdown = document.querySelector('.profile-dropdown');
         const accountContainer = document.querySelector('.account-container');
@@ -238,8 +260,7 @@
               // Add your navigation logic here
             } else if (text === 'Logout') {
               if (confirm('Are you sure you want to logout?')) {
-                alert('Logging out...');
-                // Add your logout logic here
+            	  window.location.href = '<%= request.getContextPath() %>/user/logout';
               }
             }
             
@@ -249,6 +270,9 @@
             profileDropdown.style.transform = 'translateY(-10px)';
           });
         });
+       	<%
+      		}
+       	%>
 
         // Product details functionality
         const quantityInput = document.getElementById('quantity');
@@ -274,35 +298,9 @@
             quantityInput.value = currentValue + 1;
           }
         });
-
-        // Thumbnail image switching
-        thumbnails.forEach(thumbnail => {
-          thumbnail.addEventListener('click', function() {
-            // Remove active class from all thumbnails
-            thumbnails.forEach(t => t.classList.remove('active'));
-            // Add active class to clicked thumbnail
-            this.classList.add('active');
-            // Update main image
-            const thumbnailImg = this.querySelector('img');
-            mainImage.src = thumbnailImg.src;
-            mainImage.alt = thumbnailImg.alt;
-          });
-        });
-
-        // Buy Now button
-        buyNowBtn.addEventListener('click', function() {
-          const quantity = quantityInput.value;
-          alert(`Proceeding to checkout for ${quantity} x Intel Core i9-13900K`);
-          // Add your buy now logic here
-        });
-
-        // Add to Cart button
-        addToCartBtn.addEventListener('click', function() {
-          const quantity = quantityInput.value;
-          alert(`${quantity} x Intel Core i9-13900K added to cart!`);
-          // Add your add to cart logic here
-        });
+        
       });
+
     </script>
   </body>
 </html>

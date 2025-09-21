@@ -1,75 +1,55 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
-<%@ page import="com.switchbit.util.PaginatedResult" %>
 <%@ page import="com.switchbit.model.*" %>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up - SwitchBit</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="<%=request.getContextPath() %>/css/style.css" />
   </head>
   <body>
     <div class="page-container">
     <div class="header">
       <div class="company-logo">
         <div class="logo">
-          <img width="30px" src="icons/mouse.png" alt="" />
+          <img width="30px" src="<%=request.getContextPath() %>/icons/mouse.png" alt="" />
         </div>
         <div class="title">SwitchBit</div>
       </div>
 
       <div class="nav">
         <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="">About</a></li>
-          <li class="active"><a href="signup.html">Sign Up</a></li>
-          <li><a href="">Contact</a></li>
+          <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
+          <li><a href="<%=request.getContextPath()%>/about.html">About</a></li>
+          <li class="active"><a href="<%=request.getContextPath()%>/signup.jsp">Sign Up</a></li>
+          <li><a href="<%= request.getContextPath() %>/signin.jsp">Sign In</a></li>
+          <li><a href="<%=request.getContextPath()%>/contact.jsp">Contact</a></li>
         </ul>
       </div>
 
       <div class="side-container">
         <div class="search-container">
-          <div class="search-input">
-            <input
-              type="text"
-              placeholder="Search products..."
-              name="search-query"
-              class="search-field"
-            />
-            <button class="search-btn" type="submit">
-              <img width="16px" src="icons/search-interface-symbol.png" alt="Search" />
-            </button>
-          </div>
-        </div>
-        <div class="cart-container">
-          <div class="side-icon">
-            <img width="20px" src="icons/shopping-cart.png" alt="c" />
-          </div>
-        </div>
-        <div class="account-container">
-          <div class="side-icon profile-trigger">
-            <img width="20px" src="icons/profile-icon.png" alt="Profile" />
-          </div>
-          <div class="profile-dropdown">
-            <div class="dropdown-item">
-              <span class="dropdown-icon">📦</span>
-              <span>Your Orders</span>
+          <form action="<%=request.getContextPath() %>/product/searchproduct" method="GET">
+            <div class="search-input">
+              <input
+                type="text"
+                placeholder="Search products..."
+                name="search_query"
+                class="search-field"
+                value="<%= request.getParameter("search_query") != null ? request.getParameter("search_query") : "" %>"
+              />
+              <button class="search-btn" type="submit">
+                <img width="16px" src="<%=request.getContextPath() %>/icons/search-interface-symbol.png" alt="Search" />
+              </button>
             </div>
-            <div class="dropdown-item">
-              <span class="dropdown-icon">⚙️</span>
-              <span>Manage Account</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item logout">
-              <span class="dropdown-icon">🚪</span>
-              <span>Logout</span>
-            </div>
-          </div>
+          </form>
         </div>
+          
       </div>
-    </div>
+    </div> 
 
     <div class="main">
       <div class="signup-container">
@@ -79,13 +59,23 @@
             <p>Join SwitchBit and start shopping for the best tech products</p>
           </div>
           
-          <form class="signup-form" id="signupForm">
+        
+          <%
+        	String error = (String) request.getAttribute("errorMessage");
+        	if (error!=null){
+          %>
+          <div class="error-message"><%=error %></div>
+          <%
+        	}
+          %>
+          
+          <form method="post" class="signup-form" id="signupForm" action="<%= request.getContextPath() %>/user/signup">
             <div class="form-group">
-              <label for="name">Full Name *</label>
+              <label for="user-name">Full Name *</label>
               <input 
                 type="text" 
                 id="name" 
-                name="name" 
+                name="user-name" 
                 required 
                 placeholder="Enter your full name"
                 class="form-input"
@@ -94,11 +84,11 @@
             </div>
 
             <div class="form-group">
-              <label for="email">Email Address *</label>
+              <label for="user-email">Email Address *</label>
               <input 
                 type="email" 
                 id="email" 
-                name="email" 
+                name="user-email" 
                 required 
                 placeholder="Enter your email address"
                 class="form-input"
@@ -107,11 +97,11 @@
             </div>
 
             <div class="form-group">
-              <label for="phone">Phone Number *</label>
+              <label for="user-phone">Phone Number *</label>
               <input 
                 type="tel" 
                 id="phone" 
-                name="phone" 
+                name="user-phone" 
                 required 
                 placeholder="Enter your phone number"
                 class="form-input"
@@ -120,10 +110,10 @@
             </div>
 
             <div class="form-group">
-              <label for="address">Address (Optional)</label>
+              <label for="user-address">Address (Optional)</label>
               <textarea 
                 id="address" 
-                name="address" 
+                name="user-address" 
                 placeholder="Enter your address"
                 class="form-input"
                 rows="3"
@@ -131,12 +121,12 @@
             </div>
 
             <div class="form-group">
-              <label for="password">Password *</label>
+              <label for="user-password">Password *</label>
               <div class="password-input-wrapper">
                 <input 
                   type="password" 
                   id="password" 
-                  name="password" 
+                  name="user-password" 
                   required 
                   placeholder="Create a strong password"
                   class="form-input"
@@ -165,23 +155,14 @@
               </div>
               <span class="error-message" id="confirmPasswordError"></span>
             </div>
-
-            <!-- <div class="form-group checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="terms" name="terms" required />
-                <span class="checkmark"></span>
-                I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>
-              </label>
-              <span class="error-message" id="termsError"></span>
-            </div> -->
-
+            
             <button type="submit" class="signup-btn">
               <span class="btn-text">Create Account</span>
               <span class="btn-loader" style="display: none;">⏳</span>
             </button>
 
             <div class="login-link">
-              <p>Already have an account? <a href="signin.html" class="login-link-text">Sign In</a></p>
+              <p>Already have an account? <a href="<%=request.getContextPath()%>/signin.jsp" class="login-link-text">Sign In</a></p>
             </div>
           </form>
         </div>
@@ -227,62 +208,7 @@
     <script>
       // Profile dropdown functionality
       document.addEventListener('DOMContentLoaded', function() {
-        const profileTrigger = document.querySelector('.profile-trigger');
-        const profileDropdown = document.querySelector('.profile-dropdown');
-        const accountContainer = document.querySelector('.account-container');
-        
-        // Toggle dropdown on click
-        profileTrigger.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const isVisible = profileDropdown.style.opacity === '1';
-          
-          if (isVisible) {
-            profileDropdown.style.opacity = '0';
-            profileDropdown.style.visibility = 'hidden';
-            profileDropdown.style.transform = 'translateY(-10px)';
-          } else {
-            profileDropdown.style.opacity = '1';
-            profileDropdown.style.visibility = 'visible';
-            profileDropdown.style.transform = 'translateY(0)';
-          }
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-          if (!accountContainer.contains(e.target)) {
-            profileDropdown.style.opacity = '0';
-            profileDropdown.style.visibility = 'hidden';
-            profileDropdown.style.transform = 'translateY(-10px)';
-          }
-        });
-        
-        // Handle dropdown item clicks
-        const dropdownItems = document.querySelectorAll('.dropdown-item');
-        dropdownItems.forEach(item => {
-          item.addEventListener('click', function() {
-            const text = this.querySelector('span:last-child').textContent;
-            
-            // Handle different actions
-            if (text === 'Your Orders') {
-              alert('Redirecting to Your Orders page...');
-              // Add your navigation logic here
-            } else if (text === 'Manage Account') {
-              alert('Redirecting to Account Management...');
-              // Add your navigation logic here
-            } else if (text === 'Logout') {
-              if (confirm('Are you sure you want to logout?')) {
-                alert('Logging out...');
-                // Add your navigation logic here
-              }
-            }
-            
-            // Close dropdown after action
-            profileDropdown.style.opacity = '0';
-            profileDropdown.style.visibility = 'hidden';
-            profileDropdown.style.transform = 'translateY(-10px)';
-          });
-        });
-
+       
         // Signup form functionality
         const signupForm = document.getElementById('signupForm');
         const passwordToggle = document.getElementById('passwordToggle');
@@ -373,7 +299,6 @@
 
         // Form submission
         signupForm.addEventListener('submit', function(e) {
-          e.preventDefault();
           
           // Clear previous errors
           const errorElements = document.querySelectorAll('.error-message');
@@ -389,7 +314,7 @@
           const address = document.getElementById('address').value.trim();
           const password = document.getElementById('password').value;
           const confirmPassword = document.getElementById('confirmPassword').value;
-          const terms = document.getElementById('terms').checked;
+      
 
           let isValid = true;
 
@@ -435,34 +360,29 @@
             isValid = false;
           }
 
-          // Validate terms
-          if (!terms) {
-            showError('terms', 'You must agree to the terms and conditions');
-            isValid = false;
-          }
-
           if (isValid) {
-            // Show loading state
-            const submitBtn = document.querySelector('.signup-btn');
-            const btnText = document.querySelector('.btn-text');
-            const btnLoader = document.querySelector('.btn-loader');
-            
-            btnText.style.display = 'none';
-            btnLoader.style.display = 'inline';
-            submitBtn.disabled = true;
+        	    // Show loading state
+        	    const submitBtn = document.querySelector('.signup-btn');
+        	    const btnText = document.querySelector('.btn-text');
+        	    const btnLoader = document.querySelector('.btn-loader');
+        	    
+        	    btnText.style.display = 'none';
+        	    btnLoader.style.display = 'inline';
+        	    submitBtn.disabled = true;
 
-            // Simulate form submission
-            setTimeout(() => {
-              alert('Account created successfully! Welcome to SwitchBit!');
-              // Reset form
-              signupForm.reset();
-              btnText.style.display = 'inline';
-              btnLoader.style.display = 'none';
-              submitBtn.disabled = false;
-            }, 2000);
-          }
-        });
-      });
+        	    // Get context path from JSP
+        	    const contextPath = '<%= request.getContextPath() %>
+
+        	    // Collect form data
+        	    const form = document.getElementById('signupForm');
+        	    const formData = new FormData(form);
+
+        	    // Send POST request to servlet
+        	    fetch(contextPath + '/user/signup', {
+        	        method: 'POST',
+        	        body: formData
+        	    })
+        )});
     </script>
   </body>
 </html>

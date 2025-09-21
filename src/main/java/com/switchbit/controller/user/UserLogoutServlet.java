@@ -21,7 +21,7 @@ public class UserLogoutServlet extends HttpServlet implements Servlet {
 			session.invalidate();
 		}
 		
-		response.sendRedirect(request.getContextPath()+ "/index.jsp");
+		response.sendRedirect(request.getContextPath()+ "/home");
 	}
 
 }

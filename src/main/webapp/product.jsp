@@ -112,7 +112,7 @@
                 </div>
                 <div class="product-details">
                   <div class="product-info">
-                    <h3 class="product-title"><%= product.getProduct_name() %></h3>
+                    <a style="text-decoration:none" href="<%=request.getContextPath()%>/product/getProduct?product-id=<%=product.getProduct_id()%>"><h3 class="product-title"><%= product.getProduct_name() %></h3></a>
                     <p class="product-description"><%= product.getDescription() %></p>
                   </div>
                   <div class="product-actions">
@@ -152,6 +152,7 @@
                 <span>←</span> Previous
               </span>
             <% } %>
+            
             
             <div class="pagination-numbers">
               <% 
@@ -284,7 +285,7 @@
                 window.location.href = '<%= request.getContextPath() %>/account.jsp';
               } else if (text === 'Logout') {
                 if (confirm('Are you sure you want to logout?')) {
-                  window.location.href = '<%= request.getContextPath() %>/logout';
+                  window.location.href = '<%= request.getContextPath() %>/user/logout';
                 }
               }
               
@@ -297,46 +298,7 @@
         }
         <% } %>
 
-        // Product card interactions
-        const buyNowButtons = document.querySelectorAll('.btn-buy-now');
-        const addToCartButtons = document.querySelectorAll('.btn-add-cart');
-
-        buyNowButtons.forEach(button => {
-          button.addEventListener('click', function() {
-            const productTitle = this.closest('.product-card-horizontal').querySelector('.product-title').textContent;
-            alert(`Proceeding to checkout for: ${productTitle}`);
-            // Add your buy now logic here
-          });
-        });
-
-        addToCartButtons.forEach(button => {
-          button.addEventListener('click', function() {
-            const productTitle = this.closest('.product-card-horizontal').querySelector('.product-title').textContent;
-            alert(`${productTitle} added to cart!`);
-            // Add your add to cart logic here
-          });
-        });
       });
-
-      // Function to handle buy now
-      function buyNow(productId, productName) {
-        alert(`Proceeding to checkout for: ${productName}`);
-        // Add your buy now logic here
-        // window.location.href = '<%= request.getContextPath() %>/checkout.jsp?productId=' + productId;
-      }
-
-      // Function to handle add to cart
-      function addToCart(productId, productName) {
-        alert(`${productName} added to cart!`);
-        // Add your add to cart logic here
-        // You can make an AJAX call to add to cart
-      }
-
-      // Function to show login alert for non-logged in users
-      function showLoginAlert() {
-        alert('Please login to add items to cart');
-        window.location.href = '<%= request.getContextPath() %>/signin.jsp';
-      }
     </script>
   </body>
 </html>
