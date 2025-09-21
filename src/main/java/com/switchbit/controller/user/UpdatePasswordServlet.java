@@ -61,18 +61,18 @@ public class UpdatePasswordServlet extends HttpServlet {
 
 
 	        // 4. Success -> forward to JSP
-	        request.setAttribute("successMessage", "Password updated successfully.");
-	        request.getRequestDispatcher("/change-password.jsp").forward(request, response);
+	        session.setAttribute("successMessage", "Password updated successfully.");
+	        response.sendRedirect(request.getContextPath()+"/change-password.jsp");
 
 	    } catch (AuthenticationException e) {
 	        // Old password mismatch
-	        request.setAttribute("errorMessage", "Invalid current password. Try again.");
-	        request.getRequestDispatcher("/change-password.jsp").forward(request, response);
+	        session.setAttribute("errorMessage", "Invalid current password. Try again.");
+	        response.sendRedirect(request.getContextPath()+"/change-password.jsp");
 
 	    } catch (DataAccessException e) {
 	        // DB failure
-	        request.setAttribute("errorMessage", "Failed to update password. Please try later.");
-	        request.getRequestDispatcher("/change-password.jsp").forward(request, response);
+	    	session.setAttribute("errorMessage", "Failed to change Password. please try again later");
+	        response.sendRedirect(request.getContextPath()+"/change-password.jsp");
 	    } catch (RollBackException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

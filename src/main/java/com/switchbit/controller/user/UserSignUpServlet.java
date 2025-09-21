@@ -38,6 +38,8 @@ public class UserSignUpServlet extends HttpServlet {
         String userPhone = request.getParameter("user-phone");
         String userAddress = request.getParameter("user-address");
         String password = request.getParameter("user-password");
+        
+        HttpSession session = request.getSession(false);
 
         // 2. Basic validation
         if (userName == null || userEmail == null || password == null ||
@@ -63,13 +65,15 @@ public class UserSignUpServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/signin.jsp");
         }
         catch (DuplicateResourceException e) {
-        	request.setAttribute("errorMessage", "Email or Phone already exists");
-        	request.getRequestDispatcher("/signup.jsp").forward(request, response);
+        	if (session!=null)
+        		session.setAttribute("errorMessage", "Email or Phone already exists");
+        	response.sendRedirect(request.getContextPath()+"/signup.jsp");
         }
         catch (DataAccessException e) {
             // Handle DB errors
-            request.setAttribute("errorMessage", "Failed to register user. Try again.");
-            request.getRequestDispatcher("/signup.jsp").forward(request, response);
+        	if (session!=null)
+        		session.setAttribute("errorMessage", "Failed to register user. Try again.");
+            response.sendRedirect(request.getContextPath()+"/signup.jsp");
         } catch (RollBackException e) {
 			e.printStackTrace();
 		} catch (CloseConnectionException e) {

@@ -223,7 +223,7 @@
               if (text === 'Your Orders') {
                 window.location.href = '<%= request.getContextPath() %>/orders.jsp';
               } else if (text === 'Manage Account') {
-                window.location.href = '<%= request.getContextPath() %>/account.jsp';
+                window.location.href = '<%= request.getContextPath() %>/profile.jsp';
               } else if (text === 'Logout') {
                 if (confirm('Are you sure you want to logout?')) {
                   window.location.href = '<%= request.getContextPath() %>/user/logout';

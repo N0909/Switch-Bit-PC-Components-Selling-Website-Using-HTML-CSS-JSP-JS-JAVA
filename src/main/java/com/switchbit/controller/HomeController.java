@@ -36,8 +36,8 @@ public class HomeController extends HttpServlet {
 			request.getRequestDispatcher("/index.jsp").forward(request, response);
 			
 		} catch (DataAccessException e) {
-			request.setAttribute("errorMessage", "Failed to fetch HomePage");
-			request.getRequestDispatcher("/index.jsp").forward(request, response);
+			request.getSession().setAttribute("errorMessage", "Failed to fetch HomePage");
+			response.sendRedirect(request.getContextPath()+"/index.jsp");
 		}
 				
 	}

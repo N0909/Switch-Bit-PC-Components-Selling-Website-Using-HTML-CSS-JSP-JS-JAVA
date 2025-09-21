@@ -58,15 +58,18 @@ public class UserUpdateServlet extends HttpServlet {
             session.setAttribute("user", sessionUser);
 
             // Redirect to a profile page or success page
+            session.setAttribute("flashMessage", "Account Updated Sucessfully");
             response.sendRedirect(request.getContextPath() + "/profile.jsp");
 
         } catch (DuplicateResourceException e) {
-            request.setAttribute("errorMessage", "Email or Phone already exists.");
-            request.getRequestDispatcher("/update-user.jsp").forward(request, response);
+        	if (session!=null)
+        		session.setAttribute("errorMessage", "Email or Phone already exists.");
+            response.sendRedirect(request.getContextPath()+"/profile.jsp");
 
         } catch (DataAccessException e) {
-            request.setAttribute("errorMessage", "Failed to update user. Please try again.");
-            request.getRequestDispatcher("/update-user.jsp").forward(request, response);
+        	if (session!=null)
+        		session.setAttribute("errorMessage", "Failed to update user. Please try again.");
+            response.sendRedirect(request.getContextPath()+"/profile.jsp");
         } catch (RollBackException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -33,49 +33,55 @@ public class UserLoginServlet extends HttpServlet {
         this.userService = new UserService(); // initialize service
     }
 
-    @Override
+  
+	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         // 1. Collect login form data
         String identifier = request.getParameter("user-identifier");
         String password = request.getParameter("user-password");
-
+        String referer = request.getParameter("page-referer");        
+        HttpSession session = request.getSession(false);
+ 
         try {
         	
-        	String referer = request.getHeader("referer");
-        	
-            // 2. Verify user using service
+        	// 2. Verify user using service
             User user = userService.verifyUser(identifier, password);
             
             
 
             // 3. If verified, create session and store user
-            HttpSession session = request.getSession(false);
             if (session!=null)
             	session.setAttribute("user", user);
 
-            if (referer!=null) {
+            if (referer.split("/")[referer.split("/").length-1].equals("signin.jsp")) {
+            	response.sendRedirect(request.getContextPath()+"/home");
+            }
+            else if (referer!=null && !"null".equals(referer)) {
             	response.sendRedirect(referer);
-            }else {
+            }
+            else {
             	response.sendRedirect(request.getContextPath()+"/home");
             }
             // 4. Redirect to success/dashboard page
 
         } catch (InvalidUserException e) {
             // User not found
-            request.setAttribute("errorMessage", "No user found with: " + identifier);
-            request.getRequestDispatcher("/signin.jsp").forward(request, response);
-
+        	if (session!=null)
+        		session.setAttribute("errorMessage", "No user found with: " + identifier);
+            response.sendRedirect(request.getContextPath()+"/signin.jsp");
         } catch (AuthenticationException e) {
             // Password invalid
-            request.setAttribute("errorMessage", "Invalid password. Try again.");
-            request.getRequestDispatcher("/signin.jsp").forward(request, response);
+        	if (session!=null)
+        		session.setAttribute("errorMessage", "Invalid Password, try again");
+            response.sendRedirect(request.getContextPath()+"/signin.jsp");
 
         } catch (DataAccessException e) {
             // DB/connection error
-            request.setAttribute("errorMessage", "Internal error. Please try again later.");
-            request.getRequestDispatcher("/signin.jsp").forward(request, response);
+        	if (session!=null)
+        		session.setAttribute("errorMessage", "Internal error. Please try again later.");
+        	response.sendRedirect(request.getContextPath()+"/signin.jsp");
         }
     }
 }
