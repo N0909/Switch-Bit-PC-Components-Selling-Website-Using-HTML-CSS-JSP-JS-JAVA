@@ -32,7 +32,7 @@ public class DBConnection {
 	            String port = System.getenv("MYSQLPORT");
 	            String database = System.getenv("MYSQLDATABASE");
 	            user = System.getenv("MYSQLUSER");
-	            password = System.getenv("MYSQLROOTPASSWORD");
+	            password = System.getenv("MYSQLPASSWORD");
 
 	            // Build JDBC URL
 	            url = String.format("jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC", host, port, database);
