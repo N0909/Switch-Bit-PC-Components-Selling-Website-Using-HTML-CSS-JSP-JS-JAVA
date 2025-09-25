@@ -35,7 +35,7 @@ public class DBConnection {
 	            password = System.getenv("MYSQLPASSWORD");
 
 	            // Build JDBC URL
-	            url = String.format("jdbc:mysql://%s:%s/%s", host, port, database);
+	            url = "mysql://root:mosYexgXGHrRphEdKTqemkDGuilahbxY@mysql.railway.internal:3306/SWITCHBIT"
 	            
 	            // Load MySQL driver
 	            Class.forName("com.mysql.cj.jdbc.Driver");
