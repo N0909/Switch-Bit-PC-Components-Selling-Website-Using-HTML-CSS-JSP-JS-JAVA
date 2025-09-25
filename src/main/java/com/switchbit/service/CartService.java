@@ -3,6 +3,7 @@ package com.switchbit.service;
 import java.sql.*;
 import java.util.ArrayList;
 import com.switchbit.dao.CartDAO;
+import com.switchbit.dto.*;
 import com.switchbit.exceptions.*;
 import com.switchbit.model.*;
 import com.switchbit.util.*;
@@ -12,6 +13,28 @@ public class CartService {
 
 	public CartService() {
 		this.dao = new CartDAO();
+	}
+	
+	public Cart getUserCart(User user) throws DataAccessException{
+		try (Connection conn = DBConnection.getConnection()) {
+			// Fetch the cart from DAO
+			Cart cart = dao.getUserCart(conn, user);
+			return cart;
+		} catch (SQLException e) {
+			// Wrap SQL exception in a custom exception with context
+			throw new DataAccessException("Failed to fetch cart for user: " + user.getUserId() +  e.getMessage());
+		}
+		
+	}
+	
+	public int getTotalItems(Cart cart) throws DataAccessException{
+		try (Connection conn = DBConnection.getConnection()){
+			int total = dao.getTotalItems(conn, cart);
+			
+			return total;
+		}catch (SQLException e) {
+			throw new DataAccessException("Failed to get total items"+e.getMessage());
+		}
 	}
 
 	/**
@@ -23,7 +46,7 @@ public class CartService {
 	 *                              user
 	 * @throws DataAccessException  if a database access error occurs
 	 */
-	public Cart getCart(User user) throws DataAccessException, NoCartFoundException {
+	public CartDTO getCart(User user) throws DataAccessException, NoCartFoundException {
 		// Validate input first (avoid DB call if user is null)
 		if (user == null) {
 			throw new NoCartFoundException("No cart available for a null user");
@@ -31,7 +54,7 @@ public class CartService {
 
 		try (Connection conn = DBConnection.getConnection()) {
 			// Fetch the cart from DAO
-			Cart cart = dao.getCart(conn, user);
+			CartDTO cart = dao.getCart(conn, user);
 
 			if (cart == null) {
 				throw new NoCartFoundException("No cart found for user: " + user.getUserId());
@@ -42,6 +65,51 @@ public class CartService {
 			// Wrap SQL exception in a custom exception with context
 			throw new DataAccessException("Failed to fetch cart for user: " + user.getUserId(), e);
 		}
+	}
+	
+	public boolean addCart(User user) throws DataAccessException, RollBackException, CloseConnectionException {
+		Connection conn = null;
+		boolean added = false;
+	    try {
+	    	conn = DBConnection.getConnection();
+	    	conn.setAutoCommit(false);
+	        Cart existingCart = dao.getUserCart(conn, user);
+	        
+	        if (existingCart.getCart_id() == null || existingCart == null) {
+	            // no cart yet → create one
+	            int currentId = IdGeneratorDAO.getCurrentIdVal(conn, "cart");
+	            String cartId = MiscUtil.idGenerator("CART0000", currentId);
+
+	            Cart cart = new Cart();
+	            cart.setCart_id(cartId);
+	            cart.setUser_id(user.getUserId());
+	            cart.setCreated_at(new Timestamp(System.currentTimeMillis()));
+
+	            added = dao.addCart(conn, cart);
+	            
+	            IdGeneratorDAO.setNextIdVal(conn, "cart", currentId);
+	            conn.commit();
+	        }
+	        return added;
+	    } catch (SQLException e) {
+	    	if (conn!=null) {
+	    		try {
+	    			conn.setAutoCommit(true);
+					conn.rollback();
+				} catch (SQLException e1) {
+					throw new RollBackException("failed to rollback", e1);
+				}
+	    	}
+	        throw new DataAccessException("Error creating cart for user " + user.getUserId(), e);
+	    } finally {
+	    	if (conn!=null) {
+	    		try {
+					conn.close();
+				} catch (SQLException e) {
+					throw new CloseConnectionException("failed to close Connection");
+				}
+	    	}
+	    }
 	}
 
 	/**
@@ -71,32 +139,13 @@ public class CartService {
 		try {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false); // Begin transaction
-
-			// If no cart exists, create one
-			if (cart == null || cart.getCart_id() == null) {
-				if (cart == null) {
-					cart = new Cart(); // create a new cart object
-				}
-				currentId = IdGeneratorDAO.getCurrentIdVal(conn, "cart");
-				String cartId = MiscUtil.idGenerator("CART0000", currentId);
-				cart.setCart_id(cartId);
-				dao.addCart(conn, cart); // persist new cart in DB
-			}
-
 			item_currentId = IdGeneratorDAO.getCurrentIdVal(conn, "cart_items");
 			String cartItemId = MiscUtil.idGenerator("CI0000", item_currentId);
-			// Attach the cart to the cartItem
-			cartItem.setCart(cart);
 			cartItem.setCart_item_id(cartItemId);
-			System.out.println(cart);
-			// Insert cart item into DB
+			cartItem.setCart_id(cart.getCart_id());
 			dao.addCartItem(conn, cartItem);
 
-			// Advance the cart sequence only if a new cart was generated
-			if (currentId != -1) {
-				IdGeneratorDAO.setNextIdVal(conn, "cart", currentId);
-				IdGeneratorDAO.setNextIdVal(conn, "cart_items", item_currentId);
-			}
+			IdGeneratorDAO.setNextIdVal(conn, "cart_items", item_currentId);
 
 			conn.commit(); // Commit transaction
 			

@@ -7,7 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpSession;
 
 import com.switchbit.service.*;
 import com.switchbit.exceptions.DataAccessException;
@@ -19,10 +19,12 @@ import com.switchbit.model.*;
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProductService product_service;
+	private CartService cart_service;
 	
 	public void init() throws ServletException{
 		super.init();
-		product_service = new ProductService();
+		this.product_service = new ProductService();
+		this.cart_service = new CartService();
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -30,7 +32,7 @@ public class HomeController extends HttpServlet {
 		try {
 			List<Product> products = product_service.getProducts(5);
 			List<Category> categories = product_service.getCategories();
-			
+				
 			request.setAttribute("products", products);
 			request.setAttribute("categories", categories);
 			request.getRequestDispatcher("/index.jsp").forward(request, response);

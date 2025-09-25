@@ -59,16 +59,18 @@
           </div>
           
           <%
-          	String error = (String) request.getAttribute("errorMessage");
+          	String error = (String) session.getAttribute("errorMessage");
           	if (error!=null){
           %>
           <div class="error-message"><%= error %></div>
           <%
+          		session.removeAttribute("errorMessage");
           	}
           %>
           
           <form method="post" action="<%=request.getContextPath()%>/user/login" class="signin-form" id="signinForm">
             <div class="form-group">
+              <input type="hidden" name="page-referer" value=<%=request.getHeader("referer") %>>
               <label for="identifier">Email or Mobile Number *</label>
               <input 
                 type="text" 

@@ -1,5 +1,9 @@
 package com.switchbit.util;
 
+import com.switchbit.dto.CartDTO;
+import com.switchbit.dto.CartItemDTO;
+import com.switchbit.model.CartItem;
+
 /**
  * Utility class for miscellaneous helper functions.
  * Provides ID generation methods for prefixed, zero-padded identifiers.
@@ -61,5 +65,14 @@ public class MiscUtil {
         String paddedNumber = String.format("%0" + numericPart.length() + "d", next);
 
         return prefix + paddedNumber;
+    }
+    
+    
+    public static double CalcuateTotal(CartDTO dto) {
+    	double total = 0;
+    	for (CartItemDTO item : dto.getItems()) {
+    		total += item.getCartItem().getQuantity()*item.getProduct().getPrice();
+    	}
+    	return total;
     }
 }

@@ -14,44 +14,43 @@ import com.switchbit.service.ProductService;
 import com.switchbit.util.*;
 import com.switchbit.exceptions.*;
 
-/**
- * Servlet implementation class SearchProductListServlet
- */
-//@WebServlet("/product/searchproduct")
+
 public class SearchProductListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProductService service;
-	/**
-	 * @see Servlet#init(ServletConfig)
-	 */
+	
+	// initializing required objects 
+	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init();
 		this.service = new ProductService();
 	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// initializing page and pageSize
 		int page = 1;
 		int pageSize = 5;
 		
+		// collecting search-query from client
 		String search_query = request.getParameter("search_query");
 		
+		// collecting requested page from client
 		String pageParam = request.getParameter("page");
 	    if (pageParam != null) {
 	        try {
+	        	// parsing integer from string
 	            page = Integer.parseInt(pageParam);
 	        } catch (NumberFormatException nfe) {
 	            System.out.println("Invalid page parameter: " + pageParam);
 	        }
 	    }
 	    
-	    
-	    // need to modify this part
+	  
 	    RequestDispatcher requestdispatcher;
 		
 		try {
+			// Fetching Products from database for current page  and mentioned search_query
 			PaginatedResult<Product> result = service.searchProductsPage(search_query,page, pageSize);
 			request.setAttribute("productsPage", result);
 			request.setAttribute("query", search_query);

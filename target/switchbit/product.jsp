@@ -6,6 +6,8 @@
 <%
     // Get session user
     User user = (User) session.getAttribute("user");
+	Integer totalItemObj = (Integer) session.getAttribute("total-item");
+	int total_item = (totalItemObj != null) ? totalItemObj : 0;
     
     // Get paginated result from request attribute
     PaginatedResult<Product> productsPage = (PaginatedResult<Product>) request.getAttribute("productsPage");
@@ -15,6 +17,10 @@
     int totalPages = (int) Math.ceil((double) productsPage.getTotal() / productsPage.getPageSize());
     int pageSize = productsPage.getPageSize();
     List<Product> products = productsPage.getItems();
+    String message = (String) session.getAttribute("successMessage");
+    if (message != null) {
+        session.removeAttribute("successMessage"); // clear after showing once
+    }
 %>
 
 <!DOCTYPE html>
@@ -24,6 +30,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Products - SwitchBit</title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css" />
+    
+    <style>
+  	.cart-container::after {
+  		content: '<%=total_item%>';
+  		position: absolute;
+  		top: -5px;
+  		right: -5px;
+  		background: #ff4757;
+  		color: white;
+  		border-radius: 50%;
+  		width: 20px;
+  		height: 20px;
+  		display: flex;
+  		align-items: center;
+  		justify-content: center;
+  		font-size: 0.7rem;
+  		font-weight: 600;
+  		border: 2px solid white;
+	}
+  </style>
   </head>
   <body>
     <div class="page-container">
@@ -69,7 +95,7 @@
         <% if (user != null) { %>
         <div class="cart-container">
           <div class="side-icon">
-            <img width="20px" src="<%= request.getContextPath() %>/icons/shopping-cart.png" alt="c" />
+            <a href="<%=request.getContextPath()%>/cart"><img width="20px" src="<%= request.getContextPath() %>/icons/shopping-cart.png" alt="c" /></a>
           </div>
         </div>
         <div class="account-container">
@@ -104,6 +130,7 @@
         </div>
 
         <div class="products-container">
+          <div id="toast"><%= (message != null) ? message : "" %></div>
           <% if (products != null && !products.isEmpty()) { %>
             <% for (Product product : products) { %>
               <div class="product-card-horizontal">
@@ -117,15 +144,19 @@
                   </div>
                   <div class="product-actions">
                     <div class="price-section">
-                      <span class="current-price">₹<%= product.getPrice() %></span>
+                      <span class="current-price">₹<%= Math.floor(product.getPrice()) %></span>
                     </div>
                     <div class="action-buttons">
                       <button class="btn-buy-now" onclick="buyNow('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Buy Now</button>
                       <% if (user != null) { %>
-                        <button class="btn-add-cart" onclick="addToCart('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Add to Cart</button>
-                      <% } else { %>
-                        <button class="btn-add-cart" onclick="showLoginAlert()">Add to Cart</button>
-                      <% } %>
+                  		<form action="<%=request.getContextPath() %>/cart" method="post">
+                  			<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
+                  			<input type="hidden" name="product_quan" value=1>
+                    		<button class="btn-add-cart" type="submit" >Add to Cart</button>
+                  		</form>
+                  	  <% } else { %>
+                    	<button class="btn-add-cart" onclick="alert(`please log in first`)">Add to Cart</button>
+                  	  <% } %>
                     </div>
                   </div>
                 </div>
@@ -297,7 +328,12 @@
           });
         }
         <% } %>
-
+        
+        <% if (message != null) { %>
+			var toast = document.getElementById("toast");
+			toast.className = "show";
+			setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+		<% } %>
       });
     </script>
   </body>

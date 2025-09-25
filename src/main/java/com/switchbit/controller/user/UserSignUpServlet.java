@@ -16,7 +16,12 @@ import com.switchbit.service.UserService;
 
 
 /**
- * Servlet implementation class UserLoginServlet
+ * Handle Signup request 
+ * Collect input from user 
+ * Check for validation
+ * Create user 
+ * success -> redirect to login/signin page
+ * failure -> redirect to signup page
  */
 public class UserSignUpServlet extends HttpServlet {
 
@@ -32,7 +37,7 @@ public class UserSignUpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Collect form input
+        // Collect form input
         String userName = request.getParameter("user-name");
         String userEmail = request.getParameter("user-email");
         String userPhone = request.getParameter("user-phone");
@@ -41,15 +46,15 @@ public class UserSignUpServlet extends HttpServlet {
         
         HttpSession session = request.getSession(false);
 
-        // 2. Basic validation
+        // Basic validation
         if (userName == null || userEmail == null || password == null ||
             userName.isEmpty() || userEmail.isEmpty() || password.isEmpty()) {
-            request.setAttribute("errorMessage", "Name, Email, and Password are required.");
-            request.getRequestDispatcher("/signup.jsp").forward(request, response);
+            session.setAttribute("errorMessage", "Name, Email, and Password are required.");
+            response.sendRedirect(request.getContextPath()+"/signup.jsp");
             return;
         }
 
-        // 3. Create User object
+        // Create User object
         User user = new User();
         user.setUserName(userName);
         user.setUserEmail(userEmail.toLowerCase().trim()); // normalize email
@@ -58,21 +63,21 @@ public class UserSignUpServlet extends HttpServlet {
         user.setRegDate(new Timestamp(System.currentTimeMillis()));
 
         try {
-            // 4. Call service to add user
+            // Call service to add user
             User createdUser = userService.addUser(user, password);
 
-            // 5. Redirect to login page
+            // Redirect to login page
             response.sendRedirect(request.getContextPath() + "/signin.jsp");
         }
         catch (DuplicateResourceException e) {
         	if (session!=null)
-        		session.setAttribute("errorMessage", "Email or Phone already exists");
+        		session.setAttribute("errorMessage", e.getMessage());
         	response.sendRedirect(request.getContextPath()+"/signup.jsp");
         }
         catch (DataAccessException e) {
             // Handle DB errors
         	if (session!=null)
-        		session.setAttribute("errorMessage", "Failed to register user. Try again.");
+        		session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath()+"/signup.jsp");
         } catch (RollBackException e) {
 			e.printStackTrace();

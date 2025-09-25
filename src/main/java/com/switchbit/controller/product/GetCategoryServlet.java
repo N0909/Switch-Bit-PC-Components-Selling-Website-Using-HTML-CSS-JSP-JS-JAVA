@@ -14,9 +14,8 @@ import com.switchbit.exceptions.*;
 import com.switchbit.service.ProductService;
 
 /**
- * Servlet implementation class GetCategoryServlet
+ * Handles request for fetching categories from db
  */
-//@WebServlet("/product/category")
 public class GetCategoryServlet extends HttpServlet {
 	private ProductService service;
 	
@@ -27,12 +26,15 @@ public class GetCategoryServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
+			// fetch category from db
 			List<Category> category = service.getCategories();
+			// set on request attribute
 			request.setAttribute("category", category);
+			// forward it to categories
 			request.getRequestDispatcher("/categories.jsp").forward(request, response);
 		}catch(DataAccessException e){
-			request.setAttribute("errorMessage", "Failed to get categories");
-			request.getRequestDispatcher("/error.jsp").forward(request, response);
+			request.getSession().setAttribute("errorMessage", e.getMessage());
+			response.sendRedirect(request.getContextPath()+"/error.jsp");
 		}
 	}
 

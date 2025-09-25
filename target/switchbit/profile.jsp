@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.switchbit.model.*" %>
 <%
-	String error = (String) request.getAttribute("errorMessage");
+	String error = (String) session.getAttribute("errorMessage");
+	String flash = (String) session.getAttribute("flashMessage");
     User user = (User) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect("signin.jsp");
@@ -79,8 +80,18 @@
                 %>
                 	<div class="error-message"><%=error %></div>
                 <%
+                		session.removeAttribute("errorMessage");
                 	}
                 %>
+                <%
+                  if (flash != null) {
+				%>
+  					 <div class="success-message"><%= flash %></div>
+				<%
+      						session.removeAttribute("flashMessage"); // remove after showing
+   						}
+				%>
+				
                 <form class="signup-form" action="<%=request.getContextPath()%>/user/update" method="post">
                     
                     <div class="form-group">
@@ -115,7 +126,7 @@
                     
                     <button type="submit" class="signup-btn">Update</button>
                 </form>
-                <button class="signup-btn">Update Password</button>
+                <button class="signup-btn" onclick="window.location.href = '<%= request.getContextPath() %>/change-password.jsp'">Change Password</button>
             </div>
         </div>
     </main>

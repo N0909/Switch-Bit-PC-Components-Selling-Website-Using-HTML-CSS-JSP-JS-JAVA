@@ -1,61 +1,58 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
-import com.switchbit.util.*;
-import com.switchbit.dao.CartDAO;
-import com.switchbit.dao.ProductDAO;
-import com.switchbit.dao.UserDAO;
-import com.switchbit.dto.UserWithPassword;
-import com.switchbit.exceptions.*;
 import com.switchbit.model.*;
+import com.switchbit.dao.*;
 import com.switchbit.service.*;
-import com.switchbit.service.ProductService;
-import com.switchbit.dao.ProductDAO;
+import com.switchbit.exceptions.*;
+import com.switchbit.dto.*;
+import com.switchbit.util.*;
+
 
 public class Test {
 	public static void main(String[] args) {
-		CartService cart_service = new CartService();
-		UserService user_service = new UserService();
-		ProductService prod_service = new ProductService();
-		CartDAO cart_dao = new CartDAO();
-		
+//		OrderService o_serv = new OrderService();
+//		UserService u_serv = new UserService();
+//		ProductService p_serv = new ProductService();
+//		CartService c_serv = new CartService();
+//		
+//		try {
+//			User user = u_serv.verifyUser("8368872770", "1234");
+////			Product product = p_serv.getProduct("PROD001");
+//			CartDTO c_dto = c_serv.getCart(user);
+//			
+//			o_serv.placeCartOrder(c_dto);
+//			
+//			List<Order> orders = o_serv.getOrders(user);
+////			List<OrderItem> orderItem = o_serv.getOrderItems(orders.get(1));
+//			System.out.println(orders);
+//		} catch (AuthenticationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (InvalidUserException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (DataAccessException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (RollBackException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (CloseConnectionException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}catch (NoCartFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
 		try {
 			Connection conn = DBConnection.getConnection();
-			Cart cart = new Cart();
-			CartItem cartItem = new CartItem();
-			Product product = prod_service.getProduct("PROD002");
-			User user = user_service.verifyUser("USR00001", "1234567890");
-            			
-			cart.setCart_id("CART0000");
-			cart.setUser(user);
-			cart.setCreated_at(new Timestamp(System.currentTimeMillis()));
-
-			cartItem.setCart_item_id("CI000");
-			cartItem.setCart(cart);
-			cartItem.setProduct(product);
-			cartItem.setQuantity(5);
-			
-			cart_service.updateCartItemQuantity(cartItem);
-			
-			System.out.println("Successfully delted Cart item");
-		} catch (AuthenticationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidUserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DataAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (RollBackException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CloseConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			System.out.println(conn);
+		}catch(SQLException e) {
 			e.printStackTrace();
 		}
+		
 	}
 }

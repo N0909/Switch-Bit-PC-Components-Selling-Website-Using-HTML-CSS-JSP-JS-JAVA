@@ -4,7 +4,14 @@
 <%
     // Get session user
     User user = (User) session.getAttribute("user");
+	Integer totalItemObj = (Integer) session.getAttribute("total-item");
+	int total_item = (totalItemObj != null) ? totalItemObj : 0;
 	Product product = (Product) request.getAttribute("product");
+	
+	String message = (String) session.getAttribute("successMessage");
+    if (message != null) {
+        session.removeAttribute("successMessage"); // clear after showing once
+    }
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,6 +20,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Details - SwitchBit</title>
     <link rel="stylesheet" href="<%=request.getContextPath() %>/css/style.css" />
+    <style>
+  	.cart-container::after {
+  		content: '<%=total_item%>';
+  		position: absolute;
+  		top: -5px;
+  		right: -5px;
+  		background: #ff4757;
+  		color: white;
+  		border-radius: 50%;
+  		width: 20px;
+  		height: 20px;
+  		display: flex;
+  		align-items: center;
+  		justify-content: center;
+  		font-size: 0.7rem;
+  		font-weight: 600;
+  		border: 2px solid white;
+	}
+  </style>
   </head>
   <body>
     <div class="page-container">
@@ -61,7 +87,7 @@
         %>
         <div class="cart-container">
           <div class="side-icon">
-            <img width="20px" src="<%=request.getContextPath() %>/icons/shopping-cart.png" alt="c" />
+            <a href="<%=request.getContextPath()%>/cart"><img width="20px" src="<%= request.getContextPath() %>/icons/shopping-cart.png" alt="c" /></a>
           </div>
         </div>
         <div class="account-container">
@@ -100,7 +126,8 @@
           <span class="breadcrumb-separator">></span>
           <span class="breadcrumb-current"><%=product.getProduct_name() %></span>
         </div>
-
+        
+        <div id="toast"><%= (message != null) ? message : "" %></div>
         <div class="product-details-container">
           <div class="product-image-section">
             <div class="main-image">
@@ -116,7 +143,7 @@
             </div>
 
             <div class="product-price">
-              <span class="current-price">₹<%=product.getPrice() %></span>
+              <span class="current-price">₹<%= Math.floor(product.getPrice()) %></span>
             </div>
 
             <div class="product-description">
@@ -137,7 +164,15 @@
 
               <div class="action-buttons">
                 <button class="btn-buy-now-large">Buy Now</button>
-                <button class="btn-add-cart-large">Add to Cart</button>
+                <% if (user != null) { %>
+                  		<form action="<%=request.getContextPath() %>/cart" method="post">
+                  			<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
+                  			<input type="hidden" id="product_quan" name="product_quan" value=1>
+                    		<button class="btn-add-cart" type="submit" >Add to Cart</button>
+                  		</form>
+                  	  <% } else { %>
+                    	<button class="btn-add-cart" onclick="alert(`please log in first`)">Add to Cart</button>
+                <% } %>
               </div>
             </div>
 
@@ -275,6 +310,7 @@
 
         // Product details functionality
         const quantityInput = document.getElementById('quantity');
+        const productQuan = document.getElementById('product_quan');
         const minusBtn = document.querySelector('.quantity-btn.minus');
         const plusBtn = document.querySelector('.quantity-btn.plus');
         const buyNowBtn = document.querySelector('.btn-buy-now-large');
@@ -287,6 +323,7 @@
           const currentValue = parseInt(quantityInput.value);
           if (currentValue > 1) {
             quantityInput.value = currentValue - 1;
+            productQuan.value = currentValue-1;
           }
         });
 
@@ -295,8 +332,17 @@
           const maxValue = parseInt(quantityInput.getAttribute('max'));
           if (currentValue < maxValue) {
             quantityInput.value = currentValue + 1;
+            productQuan.value = currentValue+1;
           }
         });
+        
+        <% if (message != null) { %>
+			var toast = document.getElementById("toast");
+			toast.className = "show";
+			setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+		<% } %>
+		
+		
         
       });
 

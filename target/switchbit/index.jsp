@@ -5,12 +5,16 @@
 <%
     // Get session user
     User user = (User) session.getAttribute("user");
-    
+	Integer totalItemObj = (Integer) session.getAttribute("total-item");
+	int total_item = (totalItemObj != null) ? totalItemObj : 0;
     // Get data from HomeController
     List<Product> products = (List<Product>) request.getAttribute("products");
     List<Category> categories = (List<Category>) request.getAttribute("categories");
+    String message = (String) session.getAttribute("successMessage");
+    if (message != null) {
+        session.removeAttribute("successMessage"); // clear after showing once
+    }
 %>
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -19,6 +23,25 @@
     <title>SwitchBit</title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css" />
   </head>
+  <style>
+  	.cart-container::after {
+  		content: '<%=total_item%>';
+  		position: absolute;
+  		top: -5px;
+  		right: -5px;
+  		background: #ff4757;
+  		color: white;
+  		border-radius: 50%;
+  		width: 20px;
+  		height: 20px;
+  		display: flex;
+  		align-items: center;
+  		justify-content: center;
+  		font-size: 0.7rem;
+  		font-weight: 600;
+  		border: 2px solid white;
+	}
+  </style>
   <body>
     <div class="page-container">
     <div class="header">
@@ -62,7 +85,7 @@
         <% if (user != null) { %>
         <div class="cart-container">
           <div class="side-icon">
-            <img width="20px" src="<%= request.getContextPath() %>/icons/shopping-cart.png" alt="c" />
+            <a href="<%=request.getContextPath()%>/cart"><img width="20px" src="<%= request.getContextPath() %>/icons/shopping-cart.png" alt="c" /></a>
           </div>
         </div>
         <div class="account-container">
@@ -91,6 +114,7 @@
 
     <div class="main">
       <!-- Featured Products Section -->
+      <div id="toast"><%= (message != null) ? message : "" %></div>
       <div class="featured-section">
         <h2 class="section-title">Featured Products</h2>
         <div class="product-cards">
@@ -107,13 +131,17 @@
 	                  />
 	                </div>
 	                <a style="text-decoration:none;" href="<%=request.getContextPath()%>/product/getProduct?product-id=<%=product.getProduct_id()%>"><div class="product-name"><%= product.getProduct_name() %></div></a>
-	                <div class="price">₹<%= product.getPrice() %></div>
+	                <div class="price">₹<%= Math.floor(product.getPrice()) %></div>
                 <div class="buttons">
                   <button onclick="buyNow('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Buy Now</button>
                   <% if (user != null) { %>
-                    <button onclick="addToCart('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Add to Cart</button>
+                  	<form action="<%=request.getContextPath() %>/cart" method="post">
+                  		<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
+                  		<input type="hidden" name="product_quan" value=1>
+                    	<button type="submit">Add to Cart</button>
+                  	</form>
                   <% } else { %>
-                    <button onclick="showLoginAlert()">Add to Cart</button>
+                    <button onclick="alert(`please log in first`)">Add to Cart</button>
                   <% } %>
                 </div>
               </div>
@@ -238,8 +266,13 @@
           });
         }
         <% } %>
+             
+        	<% if (message != null) { %>
+        		var toast = document.getElementById("toast");
+        		toast.className = "show";
+        		setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+    		<% } %>
       });
-
     </script>
   </body>
 </html>

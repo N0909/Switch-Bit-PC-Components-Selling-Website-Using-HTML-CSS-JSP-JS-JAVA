@@ -14,9 +14,8 @@ import com.switchbit.model.Product;
 import com.switchbit.util.*;
 import com.switchbit.exceptions.*;
 /**
- * Servlet implementation class GetProductServlet
+ * Fetch ProductByProductId from database
  */
-//@WebServlet("/product/getProduct")
 public class GetProductServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProductService service;
@@ -26,19 +25,20 @@ public class GetProductServlet extends HttpServlet {
 		this.service = new ProductService();
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// collecting input from form
 		String product_id = request.getParameter("product-id");
 		
 		
 		try {
+			// fetching product from db
 			Product product = service.getProduct(product_id);
+			// forwarding product object to product-details.jsp
 			request.setAttribute("product", product);
 			request.getRequestDispatcher("/product-details.jsp").forward(request, response);
 		}catch(DataAccessException e) {
-			request.setAttribute("errorMessage", "failed to retreive product");
+			// error message
+			request.setAttribute("errorMessage", e.getMessage());
 			request.getRequestDispatcher("/product-details.jsp").forward(request, response);
 		}
 		

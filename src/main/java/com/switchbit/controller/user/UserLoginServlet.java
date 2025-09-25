@@ -3,10 +3,13 @@ package com.switchbit.controller.user;
 import java.io.IOException;
 
 import com.switchbit.exceptions.AuthenticationException;
+import com.switchbit.exceptions.CloseConnectionException;
 import com.switchbit.exceptions.DataAccessException;
 import com.switchbit.exceptions.InvalidUserException;
-import com.switchbit.service.UserService;
-import com.switchbit.model.User;
+import com.switchbit.exceptions.NoCartFoundException;
+import com.switchbit.exceptions.RollBackException;
+import com.switchbit.service.*;
+import com.switchbit.model.*;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -22,15 +25,17 @@ import jakarta.servlet.http.HttpSession;
  * 3. On success → create session and redirect.
  * 4. On failure → return error message to login.jsp.
  */
-//@WebServlet("/user/login")  // you can map in web.xml instead
 public class UserLoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserService userService;
+    private CartService cartService;
 
     @Override
     public void init() throws ServletException {
+    	// initialize service
         super.init();
-        this.userService = new UserService(); // initialize service
+        this.userService = new UserService();
+        this.cartService = new CartService();
     }
 
   
@@ -38,33 +43,53 @@ public class UserLoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Collect login form data
+        // Collect login form data
         String identifier = request.getParameter("user-identifier");
         String password = request.getParameter("user-password");
+        // referer to identify from where request come from
         String referer = request.getParameter("page-referer");        
         HttpSession session = request.getSession(false);
  
         try {
         	
-        	// 2. Verify user using service
+        	//  Verify user using service
             User user = userService.verifyUser(identifier, password);
-            
-            
+            // Get user cart
+			Cart cart = cartService.getUserCart(user);
+			
+			// if cart is null then create a new cart
+			if (cart.getCart_id()==null || cart==null) {
+				try {
+					cartService.addCart(user);
+					cart =  cartService.getUserCart(user);
+				} catch (RollBackException e) {
+					e.printStackTrace();
+				} catch (CloseConnectionException e) {
+					e.printStackTrace();
+				}
+			}
+			if (cart.getCart_id()!=null)
+				System.out.println(cartService.getTotalItems(cart));
+				session.setAttribute("total-item", cartService.getTotalItems(cart));
+				
 
-            // 3. If verified, create session and store user
+            // If verified, create session and store user and cart
             if (session!=null)
             	session.setAttribute("user", user);
+            	session.setAttribute("userCart", cart);
 
-            if (referer.split("/")[referer.split("/").length-1].equals("signin.jsp")) {
+            // Check request comes from signup.jsp or signin.jsp (if yes redirect to homepage)
+            if (referer.split("/")[referer.split("/").length-1].equals("signin.jsp") || referer.split("/")[referer.split("/").length-1].equals("signup.jsp")) {
             	response.sendRedirect(request.getContextPath()+"/home");
             }
+            // check if referer is not null if not then redirect to refering page
             else if (referer!=null && !"null".equals(referer)) {
             	response.sendRedirect(referer);
             }
+            // default page 
             else {
             	response.sendRedirect(request.getContextPath()+"/home");
             }
-            // 4. Redirect to success/dashboard page
 
         } catch (InvalidUserException e) {
             // User not found
@@ -74,13 +99,13 @@ public class UserLoginServlet extends HttpServlet {
         } catch (AuthenticationException e) {
             // Password invalid
         	if (session!=null)
-        		session.setAttribute("errorMessage", "Invalid Password, try again");
+        		session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath()+"/signin.jsp");
 
         } catch (DataAccessException e) {
             // DB/connection error
         	if (session!=null)
-        		session.setAttribute("errorMessage", "Internal error. Please try again later.");
+        		session.setAttribute("errorMessage", e.getMessage());
         	response.sendRedirect(request.getContextPath()+"/signin.jsp");
         }
     }

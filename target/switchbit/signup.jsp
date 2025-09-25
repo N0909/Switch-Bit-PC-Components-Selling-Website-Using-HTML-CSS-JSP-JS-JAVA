@@ -61,11 +61,12 @@
           
         
           <%
-        	String error = (String) request.getAttribute("errorMessage");
+        	String error = (String) session.getAttribute("errorMessage");
         	if (error!=null){
           %>
           <div class="error-message"><%=error %></div>
           <%
+          		session.removeAttribute("errorMessage");
         	}
           %>
           

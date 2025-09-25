@@ -15,6 +15,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+
+/*
+ * Handles UserUpdate request for users
+ */
 public class UserUpdateServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserService userService;
@@ -63,12 +67,12 @@ public class UserUpdateServlet extends HttpServlet {
 
         } catch (DuplicateResourceException e) {
         	if (session!=null)
-        		session.setAttribute("errorMessage", "Email or Phone already exists.");
+        		session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath()+"/profile.jsp");
 
         } catch (DataAccessException e) {
         	if (session!=null)
-        		session.setAttribute("errorMessage", "Failed to update user. Please try again.");
+        		session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath()+"/profile.jsp");
         } catch (RollBackException e) {
 			// TODO Auto-generated catch block

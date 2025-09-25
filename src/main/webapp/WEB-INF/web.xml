@@ -81,6 +81,18 @@
   	<description></description>
   	<servlet-class>com.switchbit.controller.cart.CartController</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>DeleteCartItemServlet</servlet-name>
+  	<display-name>DeleteCartItemServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.cart.DeleteCartItemServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>UpdateCartItemQuantityServlet</servlet-name>
+  	<display-name>UpdateCartItemServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.cart.UpdateCartItemQuantityServlet</servlet-class>
+  </servlet>
   
  
   
@@ -127,6 +139,14 @@
   <servlet-mapping>
   	<servlet-name>CartController</servlet-name>
   	<url-pattern>/cart</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>DeleteCartItemServlet</servlet-name>
+  	<url-pattern>/cart/deleteCartItem</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>UpdateCartItemQuantityServlet</servlet-name>
+  	<url-pattern>/cart/updateCartItemQuantity</url-pattern>
   </servlet-mapping>
  
   <welcome-file-list>

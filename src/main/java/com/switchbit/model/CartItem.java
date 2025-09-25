@@ -2,16 +2,16 @@ package com.switchbit.model;
 
 public class CartItem {
 	private String cart_item_id;
-	private Cart cart;
-	private Product product;
+	private String cart_id;
+	private String product_id;
 	private int quantity;
 	
 	public CartItem() {}
 	
-	public CartItem(String cart_item_id, Cart cart, Product product, int quantity) {
+	public CartItem(String cart_item_id, String cart_id, String product_id, int quantity) {
 		this.cart_item_id = cart_item_id;
-		this.cart = cart;
-		this.product = product;
+		this.cart_id = cart_id;
+		this.product_id = product_id;
 		this.quantity = quantity;
 	}
 	
@@ -20,12 +20,12 @@ public class CartItem {
 		return cart_item_id;
 	}
 
-	public Cart getCart() {
-		return cart;
+	public String getCart_id() {
+		return cart_id;
 	}
 
-	public Product getProduct() {
-		return product;
+	public String getProduct_id() {
+		return product_id;
 	}
 
 	public int getQuantity() {
@@ -36,12 +36,12 @@ public class CartItem {
 		this.cart_item_id = cart_item_id;
 	}
 
-	public void setCart(Cart cart) {
-		this.cart = cart;
+	public void setProduct_id(String product_id) {
+		this.product_id = product_id;
 	}
-
-	public void setProduct(Product product) {
-		this.product = product;
+	
+	public void setCart_id(String cart_id) {
+		this.cart_id = cart_id;
 	}
 
 	public void setQuantity(int quantity) {
@@ -50,9 +50,8 @@ public class CartItem {
 
 	@Override
 	public String toString() {
-		return "CartItems [cart_item_id=" + cart_item_id + ", cart=" + cart + ", product=" + product + ", quantity="
-				+ quantity + "]";
+		return "CartItem [cart_item_id=" + cart_item_id + ", cart_id=" + cart_id + ", product_id=" + product_id
+				+ ", quantity=" + quantity + "]";
 	}
-	
-	
+
 }
