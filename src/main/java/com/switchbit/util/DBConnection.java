@@ -31,7 +31,7 @@ public class DBConnection {
 	            password = "WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa";
 
 	            // Build JDBC URL
-	            url = "jdbc:"+"mysql://root:WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa@mysql.railway.internal:3306/SwitchBitDB";
+	            url = "jdbc:"+"mysql://root:WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa@gondola.proxy.rlwy.net:59615/SwitchBitDB";
 	            
 	            // Load MySQL driver
 	            Class.forName("com.mysql.cj.jdbc.Driver");
