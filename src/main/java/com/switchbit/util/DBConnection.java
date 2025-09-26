@@ -27,11 +27,11 @@ public class DBConnection {
 	
 	    static {
 	        try {
-	            user = System.getenv("MYSQLUSER");
-	            password = System.getenv("MYSQLPASSWORD");
+	            user = System.getenv("USER");
+	            password = System.getenv("PASSWORD");
 
 	            // Build JDBC URL
-	            url = "jdbc:"+System.getenv("MYSQL_PUBLIC_URL");
+	            url = "jdbc:"+System.getenv("PUBLIC_URL");
 	            
 	            // Load MySQL driver
 	            Class.forName("com.mysql.cj.jdbc.Driver");
