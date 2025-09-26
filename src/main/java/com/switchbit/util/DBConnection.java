@@ -27,10 +27,6 @@ public class DBConnection {
 	
 	    static {
 	        try {
-	            // Read Railway internal env variables
-	            String host = System.getenv("MYSQLHOST");
-	            String port = System.getenv("MYSQLPORT");
-	            String database = System.getenv("MYSQLDATABASE");
 	            user = System.getenv("MYSQLUSER");
 	            password = System.getenv("MYSQLPASSWORD");
 
