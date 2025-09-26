@@ -27,11 +27,11 @@ public class DBConnection {
 	
 	    static {
 	        try {
-	            user = "root";
-	            password = "WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa";
+	            user = System.getenv("USER");
+	            password = System.getenv("PASSWORD");
 
 	            // Build JDBC URL
-	            url = "jdbc:"+"mysql://root:WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa@gondola.proxy.rlwy.net:59615/SwitchBitDB";
+	            url = "jdbc:"+System.getenv("URL");
 	            
 	            // Load MySQL driver
 	            Class.forName("com.mysql.cj.jdbc.Driver");
