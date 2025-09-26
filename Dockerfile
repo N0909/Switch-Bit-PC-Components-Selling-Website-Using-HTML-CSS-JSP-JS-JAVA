@@ -6,7 +6,6 @@ RUN rm -rf /usr/local/tomcat/webapps/ROOT
 
 # Step 3: Copy your WAR file into Tomcat webapps as ROOT.war
 COPY target/switchbit.war /usr/local/tomcat/webapps/ROOT.war
-COPY lib/mysql-connector-java-8.0.33.jar /usr/local/tomcat/lib/
 
 # Step 4: Expose port 8080 (Tomcat listens here)
 EXPOSE 8080
