@@ -31,7 +31,7 @@ public class DBConnection {
 	            password = System.getenv("PASSWORD");
 
 	            // Build JDBC URL
-	            url = "jdbc:"+System.getenv("PUBLIC_URL");
+	            url = "jdbc:"+System.getenv("URL");
 	            
 	            // Load MySQL driver
 	            Class.forName("com.mysql.cj.jdbc.Driver");
