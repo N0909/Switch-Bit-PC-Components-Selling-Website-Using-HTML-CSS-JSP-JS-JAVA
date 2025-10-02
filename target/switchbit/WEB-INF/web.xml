@@ -93,6 +93,43 @@
   	<description></description>
   	<servlet-class>com.switchbit.controller.cart.UpdateCartItemQuantityServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>OrderController</servlet-name>
+  	<display-name>OrderController</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.order.OrderController</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>OrderDetailsController</servlet-name>
+  	<display-name>OrderDetailsController</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.order.OrderDetailsController</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>BuyNowServlet</servlet-name>
+  	<display-name>BuyNowServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.payment.BuyNowServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>CheckoutServlet</servlet-name>
+  	<display-name>CheckoutServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.payment.CheckoutServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>PlaceOrder</servlet-name>
+  	<display-name>PlaceOrder</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.payment.PlaceOrder</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>ProcessPaymentServlet</servlet-name>
+  	<display-name>ProcessPaymentServlet</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.payment.ProcessPaymentServlet</servlet-class>
+  </servlet>
+  
   
  
   
@@ -148,6 +185,28 @@
   	<servlet-name>UpdateCartItemQuantityServlet</servlet-name>
   	<url-pattern>/cart/updateCartItemQuantity</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>OrderController</servlet-name>
+  	<url-pattern>/orders</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>OrderDetailsController</servlet-name>
+  	<url-pattern>/orders/orderdetail</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>BuyNowServlet</servlet-name>
+  	<url-pattern>/payment/buynow</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>CheckoutServlet</servlet-name>
+  	<url-pattern>/payment/checkout</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>ProcessPaymentServlet</servlet-name>
+  	<url-pattern>/payment/processpayment</url-pattern>
+  </servlet-mapping>
+  
+  
  
   <welcome-file-list>
         <welcome-file>home</welcome-file>

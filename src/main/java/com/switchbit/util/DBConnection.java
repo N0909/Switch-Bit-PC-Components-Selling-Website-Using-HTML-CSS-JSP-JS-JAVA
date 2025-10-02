@@ -10,39 +10,35 @@ public class DBConnection {
 	private static String password;
 	
 	
-//	static {
-//		try (InputStream input = DBConnection.class.getClassLoader().getResourceAsStream("db.properties")){
-//			Properties properties = new Properties();
-//			
-//			properties.load(input);
-//			
-//			url = properties.getProperty("db.url");
-//			user = properties.getProperty("db.username");
-//			password = properties.getProperty("db.password");
-//			Class.forName("com.mysql.cj.jdbc.Driver");
-//		}catch(Exception e) {
-//			throw new RuntimeException("Failed to Load DB config",e);
-//		}
-//	}
+	static {
+		try (InputStream input = DBConnection.class.getClassLoader().getResourceAsStream("db.properties")){
+			Properties properties = new Properties();
+			
+			properties.load(input);
+			
+			url = properties.getProperty("db.url");
+			user = properties.getProperty("db.username");
+			password = properties.getProperty("db.password");
+			Class.forName("com.mysql.cj.jdbc.Driver");
+		}catch(Exception e) {
+			throw new RuntimeException("Failed to Load DB config",e);
+		}
+	}
 	
-	    static {
-	        try {
-	            // Read Railway internal env variables
-	            String host = System.getenv("MYSQLHOST");
-	            String port = System.getenv("MYSQLPORT");
-	            String database = System.getenv("MYSQLDATABASE");
-	            user = System.getenv("MYSQLUSER");
-	            password = System.getenv("MYSQLROOTPASSWORD");
-
-	            // Build JDBC URL
-	            url = String.format("jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC", host, port, database);
-	            
-	            // Load MySQL driver
-	            Class.forName("com.mysql.cj.jdbc.Driver");
-	        } catch (Exception e) {
-	            throw new RuntimeException("Failed to load DB config", e);
-	        }
-	    }
+//	static {
+//        try {
+//            user = "root";
+//            password = "WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa";
+//
+//            // Build JDBC URL
+//            url = "jdbc:"+"mysql://root:WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa@gondola.proxy.rlwy.net:59615/SwitchBitDB"+"?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+//            
+//            // Load MySQL driver
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to load DB config", e);
+//        }
+//    }
 	    
 
 	public static Connection getConnection() throws SQLException {

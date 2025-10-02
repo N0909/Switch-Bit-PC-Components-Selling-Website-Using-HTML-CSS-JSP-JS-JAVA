@@ -85,6 +85,10 @@ public class CartController extends HttpServlet {
 			e.printStackTrace();
 		}catch(CloseConnectionException e) {
 			e.printStackTrace();
+		} catch (DuplicateResourceException e) {
+			// TODO Auto-generated catch block
+			session.setAttribute("errorMessage", e.getMessage());
+			response.sendRedirect(referer);
 		}
 	}
 }

@@ -36,6 +36,7 @@ public class UpdateCartItemQuantityServlet extends HttpServlet {
 		
 		try {
 			boolean updated = service.updateCartItemQuantity(cart_item);
+		
 			if (updated) {
 				response.sendRedirect(request.getContextPath()+"/cart");
 			}

@@ -10,10 +10,10 @@
     // Get data from HomeController
     List<Product> products = (List<Product>) request.getAttribute("products");
     List<Category> categories = (List<Category>) request.getAttribute("categories");
-    String message = (String) session.getAttribute("successMessage");
-    if (message != null) {
-        session.removeAttribute("successMessage"); // clear after showing once
-    }
+    String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -114,7 +114,22 @@
 
     <div class="main">
       <!-- Featured Products Section -->
-      <div id="toast"><%= (message != null) ? message : "" %></div>
+      <%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
       <div class="featured-section">
         <h2 class="section-title">Featured Products</h2>
         <div class="product-cards">
@@ -132,18 +147,31 @@
 	                </div>
 	                <a style="text-decoration:none;" href="<%=request.getContextPath()%>/product/getProduct?product-id=<%=product.getProduct_id()%>"><div class="product-name"><%= product.getProduct_name() %></div></a>
 	                <div class="price">₹<%= Math.floor(product.getPrice()) %></div>
+                <% if (product.getStock_quantity()<=0){ %>
+                	<div><p>Out of Stock</p></div>
+                <% } else{ %>
                 <div class="buttons">
-                  <button onclick="buyNow('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Buy Now</button>
-                  <% if (user != null) { %>
-                  	<form action="<%=request.getContextPath() %>/cart" method="post">
-                  		<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
-                  		<input type="hidden" name="product_quan" value=1>
-                    	<button type="submit">Add to Cart</button>
-                  	</form>
-                  <% } else { %>
-                    <button onclick="alert(`please log in first`)">Add to Cart</button>
+	                <% if (user != null) { %>
+	                  <form action="<%=request.getContextPath()%>/payment/buynow" method="post">
+	                  	<input type="hidden" name="product-id" value=<%=product.getProduct_id() %>>
+	                  	<input type="hidden" name="product-quan" value=1>
+	                  	<button class="buy-now-btn" type="submit">Buy Now</button>
+	                  </form>
+	                  <% } else { %>
+	                    <button class="buy-now-btn" onclick="alert(`please log in first`)">Buy Now</button>
+	                  <% } %>
+	                 
+	                  <% if (user != null) { %>
+	                  	<form action="<%=request.getContextPath() %>/cart" method="post">
+	                  		<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
+	                  		<input type="hidden" name="product_quan" value=1>
+	                    	<button class="add-to-cart-btn" type="submit">Add to Cart</button>
+	                  	</form>
+	                  <% } else { %>
+	                    <button class="add-to-cart-btn" onclick="alert(`please log in first`)">Add to Cart</button>
+	                  <% } %>
+                	</div>
                   <% } %>
-                </div>
               </div>
             <% } %>
           <% } %>
@@ -249,7 +277,7 @@
               
               // Handle different actions
               if (text === 'Your Orders') {
-                window.location.href = '<%= request.getContextPath() %>/orders.jsp';
+                window.location.href = '<%= request.getContextPath() %>/orders';
               } else if (text === 'Manage Account') {
                 window.location.href = '<%= request.getContextPath() %>/profile.jsp';
               } else if (text === 'Logout') {
@@ -267,11 +295,25 @@
         }
         <% } %>
              
-        	<% if (message != null) { %>
-        		var toast = document.getElementById("toast");
-        		toast.className = "show";
-        		setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
-    		<% } %>
+        	<% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
+		<% } %>
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
+		<% } %>
       });
     </script>
   </body>

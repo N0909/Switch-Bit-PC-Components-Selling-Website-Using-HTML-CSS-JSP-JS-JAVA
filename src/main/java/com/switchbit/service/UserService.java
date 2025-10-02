@@ -79,7 +79,7 @@ public class UserService {
 			if (e.getErrorCode() == 1062 || "23000".equals(e.getSQLState())) {
 				throw new DuplicateResourceException("Email or Phone already exists", e);
 			} else {
-				throw new DataAccessException("Failed to add user", e);
+				throw new DataAccessException("Failed to add user. Internal Error", e);
 			}
 
 		} finally {

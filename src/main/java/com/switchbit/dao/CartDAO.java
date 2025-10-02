@@ -81,6 +81,7 @@ public class CartDAO {
 	        		product.setProduct_name(rs.getString("product_name"));
 	        		product.setPrice(rs.getDouble("price"));
 	        		product.setProduct_img(rs.getString("product_img"));
+	        		product.setStock_quantity(rs.getInt("stock_quantity"));
 	        		
 	        		item_dto.setProduct(product);
 	        		

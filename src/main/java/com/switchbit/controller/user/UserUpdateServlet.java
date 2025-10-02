@@ -62,7 +62,7 @@ public class UserUpdateServlet extends HttpServlet {
             session.setAttribute("user", sessionUser);
 
             // Redirect to a profile page or success page
-            session.setAttribute("flashMessage", "Account Updated Sucessfully");
+            session.setAttribute("successMessage", "Account Updated Sucessfully");
             response.sendRedirect(request.getContextPath() + "/profile.jsp");
 
         } catch (DuplicateResourceException e) {

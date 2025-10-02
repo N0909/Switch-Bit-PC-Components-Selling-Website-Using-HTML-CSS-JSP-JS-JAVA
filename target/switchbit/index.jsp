@@ -133,16 +133,27 @@
 	                <a style="text-decoration:none;" href="<%=request.getContextPath()%>/product/getProduct?product-id=<%=product.getProduct_id()%>"><div class="product-name"><%= product.getProduct_name() %></div></a>
 	                <div class="price">₹<%= Math.floor(product.getPrice()) %></div>
                 <div class="buttons">
-                  <button onclick="buyNow('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Buy Now</button>
+                
+                <% if (user != null) { %>
+                  <form action="<%=request.getContextPath()%>/payment/buynow" method="post">
+                  	<input type="hidden" name="product-id" value=<%=product.getProduct_id() %>>
+                  	<input type="hidden" name="product-quan" value=1>
+                  	<button class="buy-now-btn" type="submit">Buy Now</button>
+                  </form>
+                  <% } else { %>
+                    <button class="buy-now-btn" onclick="alert(`please log in first`)">Buy Now</button>
+                  <% } %>
+                  
                   <% if (user != null) { %>
                   	<form action="<%=request.getContextPath() %>/cart" method="post">
                   		<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
                   		<input type="hidden" name="product_quan" value=1>
-                    	<button type="submit">Add to Cart</button>
+                    	<button class="add-to-cart-btn" type="submit">Add to Cart</button>
                   	</form>
                   <% } else { %>
-                    <button onclick="alert(`please log in first`)">Add to Cart</button>
+                    <button class="add-to-cart-btn" onclick="alert(`please log in first`)">Add to Cart</button>
                   <% } %>
+                  
                 </div>
               </div>
             <% } %>
@@ -249,7 +260,7 @@
               
               // Handle different actions
               if (text === 'Your Orders') {
-                window.location.href = '<%= request.getContextPath() %>/orders.jsp';
+                window.location.href = '<%= request.getContextPath() %>/orders';
               } else if (text === 'Manage Account') {
                 window.location.href = '<%= request.getContextPath() %>/profile.jsp';
               } else if (text === 'Logout') {

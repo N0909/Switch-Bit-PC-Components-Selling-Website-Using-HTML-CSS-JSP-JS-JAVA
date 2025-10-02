@@ -130,7 +130,6 @@
     </div>
 
 
-
     <div class="main">
         <div class="products-page">
             <div class="page-header">
@@ -203,7 +202,7 @@
                         <h2 style="margin-bottom:0;font-size:1.4rem;color:#2c5aa0;">Total</h2>
                         <span class="cart-grand-total">₹ <%=Math.ceil(total) %></span>
                     </div>
-                    <form action="checkout.html" method="get" style="margin-bottom:8px;">
+                    <form action="<%=request.getContextPath() %>/payment/checkout" method="post" style="margin-bottom:8px;">
                         <button type="submit" class="btn-buy-now-large" style="width:100%;margin-bottom:12px;">Proceed to Checkout</button>
                     </form>
                 </div>

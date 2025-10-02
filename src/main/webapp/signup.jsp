@@ -2,6 +2,13 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.switchbit.model.*" %>
 
+<%
+	String successMessage = (String) session.getAttribute("successMessage");
+	String errorMessage = (String) session.getAttribute("errorMessage");
+	session.removeAttribute("successMessage");
+	session.removeAttribute("errorMessage");
+%>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -50,7 +57,25 @@
           
       </div>
     </div> 
-
+    
+    
+    <%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+	
     <div class="main">
       <div class="signup-container">
         <div class="signup-form-wrapper">
@@ -59,16 +84,6 @@
             <p>Join SwitchBit and start shopping for the best tech products</p>
           </div>
           
-        
-          <%
-        	String error = (String) session.getAttribute("errorMessage");
-        	if (error!=null){
-          %>
-          <div class="error-message"><%=error %></div>
-          <%
-          		session.removeAttribute("errorMessage");
-        	}
-          %>
           
           <form method="post" class="signup-form" id="signupForm" action="<%= request.getContextPath() %>/user/signup">
             <div class="form-group">
@@ -207,183 +222,141 @@
     </div>
     
     <script>
-      // Profile dropdown functionality
-      document.addEventListener('DOMContentLoaded', function() {
-       
-        // Signup form functionality
+    document.addEventListener('DOMContentLoaded', function() {
+    	
         const signupForm = document.getElementById('signupForm');
         const passwordToggle = document.getElementById('passwordToggle');
         const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirmPassword');
+        const submitBtn = document.querySelector('.signup-btn');
+
+        submitBtn.disabled = true; // Start with button disabled
 
         // Password toggle functionality
         passwordToggle.addEventListener('click', function() {
-          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-          passwordInput.setAttribute('type', type);
-          this.querySelector('.toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.querySelector('.toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
         });
 
         confirmPasswordToggle.addEventListener('click', function() {
-          const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-          confirmPasswordInput.setAttribute('type', type);
-          this.querySelector('.toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
+            const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+            confirmPasswordInput.type = type;
+            this.querySelector('.toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        // Form validation
+        // Validation functions
         function validateEmail(email) {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          return emailRegex.test(email);
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
         }
 
         function validatePhone(phone) {
-          const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-          const cleanPhone = phone.replace(/\D/g, '');
-          return cleanPhone.length >= 10 && cleanPhone.length <= 15;
+            const cleanPhone = phone.replace(/\D/g, '');
+            return cleanPhone.length >= 10 && cleanPhone.length <= 15;
         }
 
         function validatePassword(password) {
-          return password.length >= 8;
+            return password.length >= 8;
         }
 
         function showError(fieldId, message) {
-          const errorElement = document.getElementById(fieldId + 'Error');
-          const inputElement = document.getElementById(fieldId);
-          errorElement.textContent = message;
-          inputElement.classList.add('error');
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+            errorElement.textContent = message;
+            inputElement.classList.add('error');
         }
 
         function clearError(fieldId) {
-          const errorElement = document.getElementById(fieldId + 'Error');
-          const inputElement = document.getElementById(fieldId);
-          errorElement.textContent = '';
-          inputElement.classList.remove('error');
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+            errorElement.textContent = '';
+            inputElement.classList.remove('error');
         }
 
-        // Real-time validation
-        document.getElementById('email').addEventListener('blur', function() {
-          const email = this.value.trim();
-          if (email && !validateEmail(email)) {
-            showError('email', 'Please enter a valid email address');
-          } else {
-            clearError('email');
-          }
-        });
+        // Validate a single field and return boolean
+        function validateField(fieldId) {
+            const value = document.getElementById(fieldId).value.trim();
+            switch (fieldId) {
+                case 'name':
+                    if (!value) { showError(fieldId, 'Name is required'); return false; }
+                    break;
+                case 'email':
+                    if (!value) { showError(fieldId, 'Email is required'); return false; }
+                    if (!validateEmail(value)) { showError(fieldId, 'Please enter a valid email'); return false; }
+                    break;
+                case 'phone':
+                    if (!value) { showError(fieldId, 'Phone number is required'); return false; }
+                    if (!validatePhone(value)) { showError(fieldId, 'Please enter a valid phone number (10-15 digits)'); return false; }
+                    break;
+                case 'password':
+                    if (!value) { showError(fieldId, 'Password is required'); return false; }
+                    if (!validatePassword(value)) { showError(fieldId, 'Password must be at least 8 characters'); return false; }
+                    break;
+                case 'confirmPassword':
+                    const password = document.getElementById('password').value;
+                    if (!value) { showError(fieldId, 'Please confirm your password'); return false; }
+                    if (value !== password) { showError(fieldId, 'Passwords do not match'); return false; }
+                    break;
+                default:
+                    break;
+            }
+            clearError(fieldId);
+            return true;
+        }
 
-        document.getElementById('phone').addEventListener('blur', function() {
-          const phone = this.value.trim();
-          if (phone && !validatePhone(phone)) {
-            showError('phone', 'Please enter a valid phone number (10-15 digits)');
-          } else {
-            clearError('phone');
-          }
-        });
+        // Check all fields and enable/disable submit button
+        function checkFormValidity() {
+            const fields = ['name', 'email', 'phone', 'password', 'confirmPassword'];
+            const allValid = fields.every(validateField);
+            submitBtn.disabled = !allValid;
+        }
 
-        document.getElementById('password').addEventListener('blur', function() {
-          const password = this.value;
-          if (password && !validatePassword(password)) {
-            showError('password', 'Password must be at least 8 characters long');
-          } else {
-            clearError('password');
-          }
-        });
-
-        document.getElementById('confirmPassword').addEventListener('blur', function() {
-          const password = document.getElementById('password').value;
-          const confirmPassword = this.value;
-          if (confirmPassword && password !== confirmPassword) {
-            showError('confirmPassword', 'Passwords do not match');
-          } else {
-            clearError('confirmPassword');
-          }
+        // real-time validation on blur
+        ['name', 'email', 'phone', 'password', 'confirmPassword'].forEach(id => {
+            const input = document.getElementById(id);
+            input.addEventListener('input', checkFormValidity);
+            input.addEventListener('blur', () => validateField(id));
         });
 
         // Form submission
         signupForm.addEventListener('submit', function(e) {
-          
-          // Clear previous errors
-          const errorElements = document.querySelectorAll('.error-message');
-          errorElements.forEach(element => element.textContent = '');
-          
-          const inputs = document.querySelectorAll('.form-input');
-          inputs.forEach(input => input.classList.remove('error'));
 
-          // Get form values
-          const name = document.getElementById('name').value.trim();
-          const email = document.getElementById('email').value.trim();
-          const phone = document.getElementById('phone').value.trim();
-          const address = document.getElementById('address').value.trim();
-          const password = document.getElementById('password').value;
-          const confirmPassword = document.getElementById('confirmPassword').value;
-      
+            // Final validation before submission
+            checkFormValidity();
 
-          let isValid = true;
+            if (!submitBtn.disabled) {
+                const btnText = document.querySelector('.btn-text');
+                const btnLoader = document.querySelector('.btn-loader');
 
-          // Validate name
-          if (!name) {
-            showError('name', 'Name is required');
-            isValid = false;
-          }
+                btnText.style.display = 'none';
+                btnLoader.style.display = 'inline';
+                submitBtn.disabled = true; // prevent double submission
+            }
+        });
+        
+        <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
+		<% } %>
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
+		<% } %>
+    });
 
-          // Validate email
-          if (!email) {
-            showError('email', 'Email is required');
-            isValid = false;
-          } else if (!validateEmail(email)) {
-            showError('email', 'Please enter a valid email address');
-            isValid = false;
-          }
-
-          // Validate phone
-          if (!phone) {
-            showError('phone', 'Phone number is required');
-            isValid = false;
-          } else if (!validatePhone(phone)) {
-            showError('phone', 'Please enter a valid phone number (10-15 digits)');
-            isValid = false;
-          }
-
-          // Validate password
-          if (!password) {
-            showError('password', 'Password is required');
-            isValid = false;
-          } else if (!validatePassword(password)) {
-            showError('password', 'Password must be at least 8 characters long');
-            isValid = false;
-          }
-
-          // Validate confirm password
-          if (!confirmPassword) {
-            showError('confirmPassword', 'Please confirm your password');
-            isValid = false;
-          } else if (password !== confirmPassword) {
-            showError('confirmPassword', 'Passwords do not match');
-            isValid = false;
-          }
-
-          if (isValid) {
-        	    // Show loading state
-        	    const submitBtn = document.querySelector('.signup-btn');
-        	    const btnText = document.querySelector('.btn-text');
-        	    const btnLoader = document.querySelector('.btn-loader');
-        	    
-        	    btnText.style.display = 'none';
-        	    btnLoader.style.display = 'inline';
-        	    submitBtn.disabled = true;
-
-        	    // Get context path from JSP
-        	    const contextPath = '<%= request.getContextPath() %>
-
-        	    // Collect form data
-        	    const form = document.getElementById('signupForm');
-        	    const formData = new FormData(form);
-
-        	    // Send POST request to servlet
-        	    fetch(contextPath + '/user/signup', {
-        	        method: 'POST',
-        	        body: formData
-        	    })
-        )});
     </script>
   </body>
 </html>

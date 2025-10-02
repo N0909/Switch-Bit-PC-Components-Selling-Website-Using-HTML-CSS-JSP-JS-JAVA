@@ -19,14 +19,15 @@ public class Test {
 //		
 //		try {
 //			User user = u_serv.verifyUser("8368872770", "1234");
-////			Product product = p_serv.getProduct("PROD001");
+//     		Product product = p_serv.getProduct("PROD001");
 //			CartDTO c_dto = c_serv.getCart(user);
 //			
-//			o_serv.placeCartOrder(c_dto);
+//			o_serv.placeOrder(c_dto);
 //			
 //			List<Order> orders = o_serv.getOrders(user);
-////			List<OrderItem> orderItem = o_serv.getOrderItems(orders.get(1));
-//			System.out.println(orders);
+// 		    List<OrderItemDTO> orderItem = o_serv.getOrderItems(orders.get(0));
+//			System.out.println(orderItem.get(0).getProduct());
+//			
 //		} catch (AuthenticationException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
@@ -36,23 +37,12 @@ public class Test {
 //		} catch (DataAccessException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
-//		} catch (RollBackException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (CloseConnectionException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
 //		}catch (NoCartFoundException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
-//		}
+//		} 
 //		
-		try {
-			Connection conn = DBConnection.getConnection();
-			System.out.println(conn);
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}
+		
 		
 	}
 }

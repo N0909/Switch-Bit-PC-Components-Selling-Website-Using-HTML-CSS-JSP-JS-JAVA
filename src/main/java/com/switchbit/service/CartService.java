@@ -94,7 +94,6 @@ public class CartService {
 	    } catch (SQLException e) {
 	    	if (conn!=null) {
 	    		try {
-	    			conn.setAutoCommit(true);
 					conn.rollback();
 				} catch (SQLException e1) {
 					throw new RollBackException("failed to rollback", e1);
@@ -128,9 +127,10 @@ public class CartService {
 	 * @throws RollBackException        if rollback fails after an error
 	 * @throws DataAccessException      if insertion fails
 	 * @throws CloseConnectionException if closing the connection fails
+	 * @throws DuplicateResourceException 
 	 */
 	public Cart addCartitem(Cart cart, CartItem cartItem)
-			throws RollBackException, DataAccessException, CloseConnectionException {
+			throws RollBackException, DataAccessException, CloseConnectionException, DuplicateResourceException {
 
 		Connection conn = null;
 		int currentId = -1;
@@ -159,6 +159,9 @@ public class CartService {
 				} catch (SQLException e2) {
 					throw new RollBackException("Failed to rollback transaction", e2);
 				}
+			}
+			if (e.getErrorCode()==1062 || "23000".equals(e.getSQLState())) {
+				throw new DuplicateResourceException("item already exists in cart you can increase quantity",e);
 			}
 			throw new DataAccessException("Failed to add cart item", e);
 
