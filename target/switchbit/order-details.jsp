@@ -8,14 +8,16 @@
     Order order = (Order) request.getAttribute("order");
     List<OrderItemDTO> orderItems = (List<OrderItemDTO>) request.getAttribute("order-items");
     User user  = (User) session.getAttribute("user");
-    String errorMessage = (String) session.getAttribute("errorMessage");
-    session.removeAttribute("errorMessage");
     if (user == null){
         response.sendRedirect("signin.jsp");
     }
     if (orderItems == null) {
         orderItems = new ArrayList<>();
     }
+    String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
 %>
 <!DOCTYPE html>
 <html>
@@ -31,7 +33,7 @@
         }
         .order-details-header {
             margin-bottom: 2rem;
-            background: #f8f9fa;
+            background: #f8f9fa;	
             border-radius: 8px;
             padding: 1rem 1.5rem;
             box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
@@ -162,7 +164,25 @@
         <% } %>
       </div>
     </div>
-
+    
+    
+    <%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+    
     <div class="main">
         <a href="<%= request.getContextPath() %>/orders.jsp" class="button">&larr; Back to Orders</a>
         <div class="order-details-header">
@@ -189,6 +209,7 @@
                         <th>Quantity</th>
                         <th>Unit Price</th>
                         <th>Subtotal</th>
+                        <th>Stock</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -201,6 +222,11 @@
                             <td><%= item.getOrderItem().getQuantity()%></td>
                             <td>₹<%= String.format("%.2f", item.getProduct().getPrice()) %></td>
                             <td>₹<%= String.format("%.2f", item.getOrderItem().getQuantity() * item.getProduct().getPrice()) %></td>
+                            <% if (item.getProduct().getStock_quantity()>0){ %>
+                            	<td>Available</td>
+                            <%} else { %>
+                            	<td>Out of Stock</td>
+                            <% } %>
                         </tr>
                     <% } %>
                 </tbody>
@@ -256,6 +282,27 @@
           });
         }
         <% } %>
+        
+        // Handling popup messages
+        <% if (successMessage != null) { %>
+		var successtoast = document.getElementById("toast-success");
+		successtoast.className = "show";
+		successtoast.style.visibility = "visible";
+		setTimeout(function(){
+			successtoast.className = successtoast.className.replace("show", "");
+			successtoast.style.visibility = "hidden"
+		}, 6000);
+	<% } %>
+
+	<% if (errorMessage != null) { %>
+		var errortoast = document.getElementById("toast-error");
+		errortoast.className = "show";
+		errortoast.style.visibility = "visible";
+		setTimeout(function(){
+			errortoast.className = errortoast.className.replace("show", ""); 
+			errortoast.style.visibility = "hidden";
+		}, 6000);
+	<% } %>
     });
     </script>
 </body>

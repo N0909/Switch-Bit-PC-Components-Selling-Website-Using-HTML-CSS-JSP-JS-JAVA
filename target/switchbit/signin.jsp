@@ -2,6 +2,12 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.switchbit.util.PaginatedResult" %>
 <%@ page import="com.switchbit.model.*" %>
+<%
+	String successMessage = (String) session.getAttribute("successMessage");
+	String errorMessage = (String) session.getAttribute("errorMessage");
+	session.removeAttribute("successMessage");
+	session.removeAttribute("errorMessage");
+%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -49,7 +55,24 @@
         </div>
       </div>
     </div>
-
+	
+	<%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+	
     <div class="main">
       <div class="signin-container">
         <div class="signin-form-wrapper">
@@ -57,16 +80,6 @@
             <h2>Welcome Back</h2>
             <p>Sign in to your SwitchBit account</p>
           </div>
-          
-          <%
-          	String error = (String) session.getAttribute("errorMessage");
-          	if (error!=null){
-          %>
-          <div class="error-message"><%= error %></div>
-          <%
-          		session.removeAttribute("errorMessage");
-          	}
-          %>
           
           <form method="post" action="<%=request.getContextPath()%>/user/login" class="signin-form" id="signinForm">
             <div class="form-group">
@@ -103,7 +116,7 @@
 
             <button type="submit" class="signin-btn">
               <span class="btn-text">Sign In</span>
-              <span class="btn-loader" style="display: none;">â³</span>
+              <span class="btn-loader" style="display: none;">⏳</span>
             </button>
 
             <div class="signup-link">
@@ -151,84 +164,118 @@
     </div>
     
     <script>
-      // Profile dropdown functionality
-      document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
 
-                
-        // Signin form functionality
         const signinForm = document.getElementById('signinForm');
         const passwordToggle = document.getElementById('passwordToggle');
         const passwordInput = document.getElementById('password');
+        const identifierInput = document.getElementById('identifier');
+        const submitBtn = document.querySelector('.signin-btn');
+
+        submitBtn.disabled = true; // Start disabled
 
         // Password toggle functionality
         passwordToggle.addEventListener('click', function() {
-          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-          passwordInput.setAttribute('type', type);
-          this.querySelector('.toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.querySelector('.toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        // Form validation
+        // Validation functions
         function validateEmail(email) {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          return emailRegex.test(email);
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
         }
 
         function validatePhone(phone) {
-          const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-          const cleanPhone = phone.replace(/\D/g, '');
-          return cleanPhone.length >= 10 && cleanPhone.length <= 15;
+            const cleanPhone = phone.replace(/\D/g, '');
+            return cleanPhone.length >= 10 && cleanPhone.length <= 15;
         }
 
         function validateIdentifier(identifier) {
-          // Check if it's an email or phone number
-          if (validateEmail(identifier)) {
-            return { isValid: true, type: 'email' };
-          } else if (validatePhone(identifier)) {
-            return { isValid: true, type: 'phone' };
-          }
-          return { isValid: false, type: 'invalid' };
+            if (validateEmail(identifier)) return { isValid: true, type: 'email' };
+            if (validatePhone(identifier)) return { isValid: true, type: 'phone' };
+            return { isValid: false, type: 'invalid' };
         }
 
         function showError(fieldId, message) {
-          const errorElement = document.getElementById(fieldId + 'Error');
-          const inputElement = document.getElementById(fieldId);
-          errorElement.textContent = message;
-          inputElement.classList.add('error');
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+            errorElement.textContent = message;
+            inputElement.classList.add('error');
         }
 
         function clearError(fieldId) {
-          const errorElement = document.getElementById(fieldId + 'Error');
-          const inputElement = document.getElementById(fieldId);
-          errorElement.textContent = '';
-          inputElement.classList.remove('error');
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+            errorElement.textContent = '';
+            inputElement.classList.remove('error');
         }
 
-        // Real-time validation for identifier
-        document.getElementById('identifier').addEventListener('blur', function() {
-          const identifier = this.value.trim();
-          if (identifier) {
-            const validation = validateIdentifier(identifier);
-            if (!validation.isValid) {
-              showError('identifier', 'Please enter a valid email address or phone number');
-            } else {
-              clearError('identifier');
+        // Validate a single field
+        function validateField(fieldId) {
+            const value = document.getElementById(fieldId).value.trim();
+            if (fieldId === 'identifier') {
+                if (!value) { showError(fieldId, 'Email or phone is required'); return false; }
+                const validation = validateIdentifier(value);
+                if (!validation.isValid) { showError(fieldId, 'Please enter a valid email or phone'); return false; }
             }
-          }
+            if (fieldId === 'password') {
+                if (!value) { showError(fieldId, 'Password is required'); return false; }
+                if (value.length < 8) { showError(fieldId, 'Password must be at least 8 characters'); return false; }
+            }
+            clearError(fieldId);
+            return true;
+        }
+
+        // Check overall form validity
+        function checkFormValidity() {
+            const allValid = ['identifier', 'password'].every(validateField);
+            submitBtn.disabled = !allValid;
+        }
+
+        // Real-time validation
+        ['identifier', 'password'].forEach(id => {
+            const input = document.getElementById(id);
+            input.addEventListener('input', checkFormValidity);
+            input.addEventListener('blur', () => validateField(id));
         });
 
-        // Real-time validation for password
-        document.getElementById('password').addEventListener('blur', function() {
-          const password = this.value;
-          if (password && password.length < 8) {
-            showError('password', 'Password must be at least 8 characters long');
-          } else {
-            clearError('password');
-          }
+        // Form submission
+        signinForm.addEventListener('submit', function(e) {
+            checkFormValidity();
+
+            if (!submitBtn.disabled) {
+                const btnText = document.querySelector('.btn-text');
+                const btnLoader = document.querySelector('.btn-loader');
+
+                btnText.style.display = 'none';
+                btnLoader.style.display = 'inline';
+                submitBtn.disabled = true; // Prevent double submission
+
+            }
         });
         
-        
-
-      });
+        <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
+		<% } %>
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
+		<% } %>
+    });
     </script>
   </body>
 </html>

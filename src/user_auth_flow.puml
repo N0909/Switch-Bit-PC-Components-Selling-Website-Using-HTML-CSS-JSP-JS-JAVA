@@ -1,0 +1,68 @@
+@startuml
+'---------------------------
+' PlantUML - User Authentication & Login Flow
+'---------------------------
+
+skinparam defaultFontSize 30
+skinparam ArrowFontSize 20
+
+' ---------------------------
+' Model Layer
+' ---------------------------
+package "Model Layer" {
+    class User {
+        - userId: String
+        - userName: String
+        - userEmail: String
+        - userPhone: String
+        - userAddress: String
+        - reg_date: Timestamp
+        + getters/setters
+    }
+}
+
+' ---------------------------
+' DAO Layer
+' ---------------------------
+package "DAO Layer" {
+    class UserDAO {
+        + addUser(user: User, password: String)
+        + getUser(identifier: String) : UserWithPassword
+    }
+}
+
+' ---------------------------
+' Service Layer
+' ---------------------------
+package "Service Layer" {
+    class UserService {
+        - userDAO: UserDAO
+        + addUser(user: User, password: String)
+        + verifyUser(identifier: String, password: String)
+    }
+}
+
+' ---------------------------
+' Controller Layer
+' ---------------------------
+package "Controller Layer" {
+    class UserSignUpServlet {
+        - userService: UserService
+        + doPost()
+    }
+
+    class UserLoginServlet {
+        - userService: UserService
+        + doPost()
+    }
+}
+
+' ---------------------------
+' Relationships showing actual program flow
+' ---------------------------
+UserSignUpServlet --> UserService : calls registerUser()
+UserLoginServlet --> UserService : calls authenticateUser()
+UserService --> UserDAO : calls addUser(), getUser(), validateUser()
+UserDAO --> User : maps to
+
+@enduml

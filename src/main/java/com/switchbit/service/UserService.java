@@ -96,6 +96,7 @@ public class UserService {
 
 		return user;
 	}
+	
 
 	/**
 	 * Verifies user credentials (identifier + password).
@@ -120,7 +121,6 @@ public class UserService {
 				throw new InvalidUserException("Invalid User with identifier: " + identifier);
 			}
 
-			String hashPassword = PasswordUtil.hashPassword(password);
 			boolean valid = PasswordUtil.verifyPassword(password, uwp.getPassword().getPassword());
 
 			if (valid) {

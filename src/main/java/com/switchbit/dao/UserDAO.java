@@ -8,6 +8,7 @@ import com.switchbit.exceptions.DuplicateResourceException;
 import com.switchbit.util.*;
 
 import java.sql.*;
+import java.util.*;
 
 // This Class is responsible for Handling Users
 public class UserDAO {
@@ -136,6 +137,25 @@ public class UserDAO {
 			// Executing Procedure
 			updatePassword.execute();
 		}
+	}
+	
+	public List<User> getUsers(Connection conn) throws SQLException {
+		List<User> users = new ArrayList<>();
+		try (Statement stmt = conn.createStatement()){
+			try (ResultSet rs = stmt.executeQuery("SELECT user_id,name,email,phone,address,reg_date");){
+				while (rs.next()) {
+					users.add(new User(
+								rs.getString("user_id"),
+								rs.getString("name"),
+								rs.getString("email"),
+								rs.getString("phone"),
+								rs.getString("address"),
+								rs.getTimestamp("reg_date")
+							));
+				}
+			}
+		}
+		return users;
 	}
 	
 	

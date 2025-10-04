@@ -3,16 +3,6 @@
 <%@ page import="com.switchbit.model.*" %> 
 <%@ page import="com.switchbit.dto.*" %>
 <%
-
-	String error = (String) session.getAttribute("errorMessage");
-	String message = (String) session.getAttribute("successMessage");
-	
-	if (message!=null)
-		session.removeAttribute("successMessage");
-	
-	if (error!=null)
-		session.removeAttribute("errorMessage");
-	
 	Integer totalItemObj = (Integer) session.getAttribute("total-item");
 	int total_item = (totalItemObj != null) ? totalItemObj : 0;
 	//Get session user
@@ -28,6 +18,11 @@
 	if (cart!=null){	
 		items = cart.getItems();
 	}
+	
+	String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
 	
 %>
 <!DOCTYPE html>
@@ -130,6 +125,23 @@
     </div>
 
 
+	<%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+    
     <div class="main">
         <div class="products-page">
             <div class="page-header">
@@ -138,6 +150,7 @@
             </div>
 
 			<%
+				// if there are no items in the cart, show this
 				if (items==null || items.isEmpty()){
 			%>
             <div class="no-products">
@@ -148,7 +161,7 @@
 				}
             %>
 
-			<div id="toast"><%= (message != null) ? message : "" %></div>
+
             <!-- If there are items in the cart, show this -->
             <div class="products-container">
             	<%
@@ -169,11 +182,11 @@
                                 <span class="current-price">₹ <%=Math.floor(item.getProduct().getPrice()) %></span>
                             </div>
                             <div class="action-buttons" style="gap: 8px;">
-                                <form class="cart-quantity-selector" action="cart/updateCartItemQuantity" method="post">
+                                <form class="cart-quantity-selector" action="<%=request.getContextPath() %>/cart/updateCartItemQuantity" method="post">
                                     <label for="quantity1" class="quantity-label">Qty</label>
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
-                                    <input id="quantity1" class="quantity-input" name="cart-item-quantity" type="number" min="1" value="<%=item.getCartItem().getQuantity() %>">
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity(this, 1)">+</button>
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity(this, -1, <%= item.getProduct().getStock_quantity()%>)">-</button>
+                                    <input id="quantity1" class="quantity-input" name="cart-item-quantity" type="number" min="1" value="<%= item.getCartItem().getQuantity() %>" max="<%= item.getProduct().getStock_quantity()%>">
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity(this, 1, <%= item.getProduct().getStock_quantity()%>)">+</button>
                                     <input type="hidden" name="cart-item-id" value="<%=item.getCartItem().getCart_item_id()%>">
                                     <button type="submit" style="display:none"></button>
                                 </form>
@@ -196,6 +209,7 @@
 			<%
 				if (total!=0){
 			%>
+			
             <div class="cart-total-container" style="margin-top:40px;display:flex;flex-direction:column;align-items:center;">
                 <div class="cart-total-box">
                     <div class="cart-total-header">
@@ -273,25 +287,41 @@
         <% } %>
         
         	// Handline Popup Messages
-        <% if (message != null) { %>
-			var toast = document.getElementById("toast");
-			toast.className = "show";
-			setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
 		<% } %>
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
+		<% } %>
+		
       });
     	
     	 // Handling Quantity Form
-    	 	function changeQuantity(button, delta){
-    		 	const input = document.getElementById("quantity1");
-    		 	let value = parseInt(input.value) || 1
-    		 	if (value<1){
-    		 		return;
-    		 	}
-    		 	value = Math.max(value+delta, 1)
-    		 	input.value = value;
-    		 	
-    		 	button.closest("form").submit();
-    	 	}
+    	function changeQuantity(button, delta, limit) {
+		    const form = button.closest("form");
+		    const input = form.querySelector(".quantity-input");
+		    let value = parseInt(input.value) || 1;
+		
+		    value = Math.max(value + delta, 1);// never below 1
+		    
+		    if (value<=limit)
+		    	input.value = value;
+		    	form.submit();
+		}
+
     </script>
 </body>
 </html>

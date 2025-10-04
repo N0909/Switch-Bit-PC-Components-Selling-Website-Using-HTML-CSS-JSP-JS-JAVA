@@ -1,14 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.switchbit.model.*" %>
+
 <%
-	String error = (String) session.getAttribute("errorMessage");
-	String flash = (String) session.getAttribute("flashMessage");
-    User user = (User) session.getAttribute("user");
-    if (user != null) {
+	User user = (User) session.getAttribute("user");
+    if (user == null) {
         response.sendRedirect("signin.jsp");
         return;
     }
+    String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
 %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -135,7 +139,25 @@
       </div>
   
     </div>
-
+    
+	
+	<%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+	
     <div class="payment-container">
     
         <div class="payment-header">
@@ -214,6 +236,7 @@
     <div id="toast"></div>
     
     <script>
+    
         function showPaymentInterface(method) {
             document.getElementById('debitCardForm').style.display = (method === 'debit') ? 'block' : 'none';
             document.getElementById('creditCardForm').style.display = (method === 'credit') ? 'block' : 'none';
@@ -288,9 +311,31 @@
             var toast = document.getElementById("toast");
             toast.innerText = msg;
             toast.className = "show";
-            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 6000);
         }
         window.onload = function() { showPaymentInterface('debit'); }
+        
+        // Handling Popup Messages
+        <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
+		<% } %>
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
+		<% } %>
+		
     </script>
     
 </body>

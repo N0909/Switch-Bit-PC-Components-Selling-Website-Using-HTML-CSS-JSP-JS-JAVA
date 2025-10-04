@@ -141,6 +141,24 @@
   	<description></description>
   	<servlet-class>com.switchbit.controller.order.CancelOrderStatus</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>AdminSignIn</servlet-name>
+  	<display-name>AdminSignIn</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.admin.AdminSignIn</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>AdminHomeController</servlet-name>
+  	<display-name>AdminHomeController</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.AdminHomeController</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>AdminUpdateProduct</servlet-name>
+  	<display-name>AdminUpdateProduct</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.admin.AdminUpdateProduct</servlet-class>
+  </servlet>
   
   
  
@@ -224,6 +242,18 @@
   <servlet-mapping>
   	<servlet-name>CancelOrder</servlet-name>
   	<url-pattern>/orders/cancel</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>AdminSignIn</servlet-name>
+  	<url-pattern>/admin/signin</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>AdminHomeController</servlet-name>
+  	<url-pattern>/admin/home</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>AdminUpdateProduct</servlet-name>
+  	<url-pattern>/admin/product/update</url-pattern>
   </servlet-mapping>
   
   

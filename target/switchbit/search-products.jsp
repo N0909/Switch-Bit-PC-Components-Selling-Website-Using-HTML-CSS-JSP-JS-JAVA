@@ -17,10 +17,11 @@
     int totalPages = productsPage.getTotalPages();
     int pageSize = productsPage.getPageSize();
     List<Product> products = productsPage.getItems();
-    String message = (String) session.getAttribute("successMessage");
-    if (message != null) {
-        session.removeAttribute("successMessage"); // clear after showing once
-    }
+    
+    String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
     
 %>
 
@@ -122,6 +123,23 @@
       </div>
     </div>
 
+	<%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+
     <div class="main">
       <div class="products-page">
         <div class="page-header">
@@ -130,7 +148,6 @@
         </div>
 
         <div class="products-container">
-          <div id="toast"><%= (message != null) ? message : "" %></div>
           <% if (products != null && !products.isEmpty()) { %>
             <% for (Product product : products) { %>
               <div class="product-card-horizontal">
@@ -146,18 +163,30 @@
                     <div class="price-section">
                       <span class="current-price">₹<%= Math.floor(product.getPrice()) %></span>
                     </div>
-                    <div class="action-buttons">
-                      <button class="btn-buy-now" onclick="buyNow('<%= product.getProduct_id() %>', '<%= product.getProduct_name() %>')">Buy Now</button>
-                      <% if (user != null) { %>
-                  		<form action="<%=request.getContextPath() %>/cart" method="post">
-                  			<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
-                  			<input type="hidden" name="product_quan" value=1>
-                    		<button class="btn-add-cart" type="submit" >Add to Cart</button>
-                  		</form>
-                  	  <% } else { %>
-                    	<button class="btn-add-cart" onclick="alert(`please log in first`)">Add to Cart</button>
-                	  <% } %>
-                    </div>
+                    <% if (product.getStock_quantity()<=0) { %>
+                    	<div><p>Out of Stock</p></div>
+                    <% } else{ %>	
+	                    <div class="action-buttons">
+	                    	<% if (user != null) { %>
+	                  		<form action="<%=request.getContextPath()%>/payment/buynow" method="post">
+	                  			<input type="hidden" name="product-id" value=<%=product.getProduct_id() %>>
+	                  			<input type="hidden" name="product-quan" value=1>
+	                  			<button class="buy-now-btn" type="submit">Buy Now</button>
+	                  		</form>
+	                  		<% } else { %>
+	                    		<button class="buy-now-btn" onclick="alert(`please log in first`)">Buy Now</button>
+	                  		<% } %>
+	                  	
+	                      <% if (user != null) { %>
+	                  		<form action="<%=request.getContextPath() %>/cart" method="post">
+	                  			<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
+	                  			<input type="hidden" name="product_quan" value=1>
+	                    		<button class="add-to-cart-btn" type="submit" >Add to Cart</button>
+	                  		</form>
+	                  	  <% } else { %>
+	                    	<button class="add-to-cart-btn" onclick="alert(`please log in first`)">Add to Cart</button>
+	                  	  <% } %>
+                  	  <%} %>
                   </div>
                 </div>
               </div>
@@ -348,10 +377,24 @@
           });
         });
         
-        <% if (message != null) { %>
-			var toast = document.getElementById("toast");
-			toast.className = "show";
-			setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
+		<% } %>
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
 		<% } %>
       });
  

@@ -240,5 +240,23 @@ public class PaymentService {
 			}
 		}
 	}
+	
+	public Double getTotalSalesToday() throws DataAccessException {
+		try (Connection conn = DBConnection.getConnection()){
+			return paymentDAO.getTotalSalesToday(conn);
+		}catch(SQLException e) {
+			throw new DataAccessException("failed to get total sales", e);
+		}
+	}
+	
+	public Integer getTotalItemSoldToday() throws DataAccessException {
+		try (Connection conn = DBConnection.getConnection()){
+			return paymentDAO.getTotalItemSoldToday(conn);
+		}catch(SQLException e) {
+			throw new DataAccessException("failed to get total item sold today", e);
+		}
+	}
+	
+	
 
 }

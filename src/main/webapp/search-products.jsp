@@ -13,7 +13,7 @@
     PaginatedResult<Product> productsPage = (PaginatedResult<Product>) request.getAttribute("productsPage");
     
     // Get current page and total pages
-    int currentPage = productsPage.getPage();
+    int currentPage = productsPage.getPage();	
     int totalPages = productsPage.getTotalPages();
     int pageSize = productsPage.getPageSize();
     List<Product> products = productsPage.getItems();
@@ -190,6 +190,7 @@
                   </div>
                 </div>
               </div>
+        	</div>
             <% } %>
           <% } else { %>
             <div class="no-products">

@@ -91,4 +91,38 @@ public class PaymentDAO {
 			return cs.executeUpdate()>0;
 		}
 	}
+	
+	public Double getTotalSalesToday(Connection conn) throws SQLException {
+	    String sql = "SELECT SUM(amount) AS total_sales " +
+	                 "FROM payments " +
+	                 "WHERE DATE(payment_date) = CURDATE()";
+
+	    try (Statement stmt = conn.createStatement();
+	         ResultSet rs = stmt.executeQuery(sql)) {
+
+	        if (rs.next()) {
+	            return rs.getDouble("total_sales"); 
+	        }
+	        return 0.0;
+	    }
+	}
+
+	
+	public Integer getTotalItemSoldToday(Connection conn) throws SQLException{
+		String sql = "SELECT SUM(o.quantity) AS total_item_sold " +
+		         	 "FROM payments p " +
+		         	 "JOIN order_items o ON o.order_id = p.order_id " +
+		         	 "WHERE DATE(payment_date) = CURDATE()";
+		try (Statement stmt = conn.createStatement();
+			 ResultSet rs = stmt.executeQuery(sql)){
+				
+			if (rs.next()) {
+					int totalItemSold = rs.getInt("total_item_sold");
+					return totalItemSold;
+			}
+			 return 0;
+		}
+	}
+	
+	
 }

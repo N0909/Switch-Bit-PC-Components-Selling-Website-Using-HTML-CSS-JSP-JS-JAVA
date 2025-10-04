@@ -1,0 +1,104 @@
+@startuml
+'---------------------------
+' PlantUML - Shopping Cart & Order Placement Flow
+'---------------------------
+
+skinparam defaultFontSize 30
+skinparam ArrowFontSize 20
+
+' ---------------------------
+' Model Layer
+' ---------------------------
+package "Model Layer" {
+    class Cart {
+        - cartId: String
+        - userId: String
+        - items: List<CartItem>
+        + getters/setters
+    }
+
+    class CartItem {
+        - productId: String
+        - quantity: int
+        + getters/setters
+    }
+
+    class Order {
+        - orderId: String
+        - userId: String
+        - totalAmount: double
+        + getters/setters
+    }
+
+    class OrderItem {
+        - orderId: String
+        - productId: String
+        - quantity: int
+        + getters/setters
+    }
+}
+
+' ---------------------------
+' DAO Layer
+' ---------------------------
+package "DAO Layer" {
+    class CartDAO {
+        + addToCart()
+        + getCart()
+        + clearCart()
+    }
+
+    class OrderDAO {
+        + placeOrder()
+        + getOrdersByUser()
+    }
+}
+
+' ---------------------------
+' Service Layer
+' ---------------------------
+package "Service Layer" {
+    class CartService {
+        - cartDAO: CartDAO
+        + addToCart()
+        + getCart()
+        + clearCart()
+    }
+
+    class OrderService {
+        - orderDAO: OrderDAO
+        - cartService: CartService
+        + placeOrder()
+        + calculateTotal()
+    }
+}
+
+' ---------------------------
+' Controller Layer
+' ---------------------------
+package "Controller Layer" {
+    class CartController {
+        - cartService: CartService
+        + doPost()
+    }
+
+    class OrderController {
+        - orderService: OrderService
+        + doPost()
+    }
+}
+
+' ---------------------------
+' Relationships showing actual program flow
+' ---------------------------
+CartController --> CartService : Step 1: addToCart()
+OrderController --> OrderService : Step 2: placeOrder()
+OrderService --> CartService : getCart()
+OrderService --> OrderDAO : placeOrder()
+CartService --> CartDAO : addToCart(), clearCart()
+CartDAO --> Cart : contains
+Cart --> CartItem : contains
+OrderDAO --> Order : contains
+Order --> OrderItem : contains
+
+@enduml

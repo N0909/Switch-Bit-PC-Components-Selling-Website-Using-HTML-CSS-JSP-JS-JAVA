@@ -6,14 +6,17 @@
 <%
     List<Order> orders = (List<Order>) session.getAttribute("orders");
 	User user  = (User) session.getAttribute("user");
-	String errorMessage = (String) session.getAttribute("errorMessage");
-	session.removeAttribute("errorMessage");
 	if (user == null){
     	response.sendRedirect("signin.jsp");
     }
     if (orders == null) {
         orders = new ArrayList<>();
     }
+    
+    String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
     
 %>
 <!DOCTYPE html>
@@ -46,6 +49,48 @@
             text-align: center;
             padding: 3rem 0;
         }
+        .confirm-payment{
+        	 padding: 12px 24px;
+			 border: none;
+			 border-radius: 8px;
+			 font-weight: 600;
+			 font-size: 0.95rem;
+			 cursor: pointer;
+			 transition: all 0.3s ease;
+			 min-width: 120px;
+			 background: linear-gradient(135deg, #2c5aa0 0%, #1e3f73 100%);
+  			color: white;
+        }
+        .confirm-payment:hover{
+        	transform: translateY(-2px);
+  			box-shadow: 0 6px 20px rgba(44, 90, 160, 0.4);
+        }
+        #toast-success{
+        	visibility: hidden;
+		    min-width: 200px;
+		    margin-left: -100px;
+		    background-color: #333;
+		    color: #fff;
+		    text-align: center;
+		    border-radius: 5px;
+		    padding: 10px;
+		    position: fixed;
+		    z-index: 1;
+		    left: 50%;
+			bottom: 30px;
+			font-size: 14px;
+        }
+        
+        #toast-success.show {
+			visibility: visible;
+			-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+			animation: fadein 0.5s, fadeout 0.5s 2.5s;
+		}
+		@-webkit-keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+		@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+		@-webkit-keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+		@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+			        
     </style>
 </head>
 <body>
@@ -117,13 +162,24 @@
       </div>
     </div>
     
+    
     <%
-    	if (errorMessage!=null){
-    %>
-    	<div class="error-message">><%=errorMessage %></div>
-    <%
-    	}
-    %>
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+    
     <div class="main">
         <h2>Your Order History</h2>
 
@@ -146,6 +202,7 @@
                         <th>Date</th>
                         <th>Total Amount</th>
                         <th>Status</th>
+                        <th>Arrival Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -160,6 +217,20 @@
                         <td><%= date %></td>
                         <td>₹<%= String.format("%.2f", total) %></td>
                         <td><%= order.getOrder_status() %></td>
+                        <% if(order.getOrder_status().equals("PENDING")){ %>
+                        	<td>
+                        		<form action="<%=request.getContextPath() %>/payment/pendingorder" method="get">
+                        			<input type="hidden" value=<%=orderId %> name="order-id">
+                        			<button class="confirm-payment" type="submit">Confirm Payment</button>
+                        		</form>
+                        		<form action="<%=request.getContextPath() %>/orders/cancel" method="get">
+                        			<input type="hidden" value=<%=orderId %> name="order-id">
+                        			<button class="confirm-payment" type="submit">Cancel Order</button>
+                        		</form>
+                        	</td>
+                        <% } else {%>
+                        	<td><%= order.getDelivery_date() %></td> 
+                        <% } %>
                     </tr>
                 <%
                     }
@@ -230,11 +301,25 @@
         }
         <% } %>
         
-        	// Handline Popup Messages
-        <% if (errorMessage != null) { %>
-			var toast = document.getElementById("toast");
-			toast.className = "show";
-			setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+    	// Handline Popup Messages
+        <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
+		<% } %>
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
 		<% } %>
       });
     </script>

@@ -7,11 +7,13 @@
    	Order order = (Order) session.getAttribute("order");
 	List<OrderItemDTO> items = (List<OrderItemDTO>) session.getAttribute("items");
 	User user  = (User) session.getAttribute("user");
-	String errorMessage = (String) session.getAttribute("errorMessage");
-	session.removeAttribute("errorMessage");
 	if (user == null){
     	response.sendRedirect("signin.jsp");
     }
+	String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,7 +42,7 @@
     .place-order-btn { width: 100%; padding: 14px 18px; border-radius: 10px; border: none; background: linear-gradient(135deg,#2c5aa0 0%,#1e3f73 100%); color: white; font-weight: 700; cursor: pointer; font-size: 1.05rem; margin-top: 20px; }
     .muted { color: #666; font-size: 0.9rem; }
     @media (max-width: 980px) { .checkout-container { grid-template-columns: 1fr; } }
-    #toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 30px; z-index: 9999; display: none; background: #333; color: #fff; padding: 10px 14px; border-radius: 6px; }
+    #toast-form { position: fixed; left: 50%; transform: translateX(-50%); bottom: 30px; z-index: 9999; display: none; background: #333; color: #fff; padding: 10px 14px; border-radius: 6px; }
   </style>
   
 </head>
@@ -66,10 +68,39 @@
         </ul>
       </div>
     </div>
-
+     
     
-
+    <%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+    
+    
     <main class="main">
+    
+   	 <%
+   	 	if (order==null) { 
+   	 		
+   	 %>
+   	 	<div class="page-container"> 
+    		The payment cannot be processed because this order is either already paid or does not exist.
+		</div>
+	
+   	 <%
+   	 	} else {
+   	 %>
       <div class="checkout-container">
         <!-- Billing / Shipping summary -->
         <section class="card">
@@ -92,18 +123,33 @@
             <div class="value"><%=user.getUserPhone() %> & <%=user.getUserEmail() %></div>
           </div>
           <div class="payment-methods">
-            <label class="selected">
-                <input type="radio" name="paymentMethod" value="debit" onclick="showPaymentInterface('debit')" checked>
-                Debit Card
-            </label>
-            <label>
-                <input type="radio" name="paymentMethod" value="credit" onclick="showPaymentInterface('credit')">
-                Credit Card
-            </label>
-            <label>
-                <input type="radio" name="paymentMethod" value="upi" onclick="showPaymentInterface('upi')">
-                UPI
-            </label>
+          
+            <label class="method-pill active" data-method="debit" onclick="showPaymentInterface('debit')">
+    			<input type="radio" name="paymentMethod" value="debit" checked hidden>
+    			<img src="https://cdn-icons-png.flaticon.com/128/9334/9334539.png" alt="" width="28"/>
+   		  		<div>
+      				<div><b>Debit Card</b></div>
+      				<div class="muted">Pay with your debit card</div>
+    			</div>
+  			</label>
+  			
+            <label class="method-pill" data-method="credit" onclick="showPaymentInterface('credit')">
+    			<input type="radio" name="paymentMethod" value="credit" hidden>
+    			<img src="https://cdn-icons-png.flaticon.com/128/8983/8983163.png" alt="" width="28"/>
+	    		<div>
+	      			<div><b>Credit Card</b></div>
+	      			<div class="muted">Pay with your credit card</div>
+	    		</div>
+  			</label>
+  			
+            <label class="method-pill" data-method="upi" onclick="showPaymentInterface('upi')">
+    			<input type="radio" name="paymentMethod" value="upi" hidden>
+    			<img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="" width="28"/>
+	    		<div>
+	      			<div><b>UPI</b></div>
+	      			<div class="muted">Fast & Secure</div>
+	    		</div>
+  			</label>
         </div>
         
         <form id="debitCardForm" class="payment-form" action="payment/processpayment" method="post" style="display:block;" onsubmit="return validateDebitCardForm()">
@@ -195,19 +241,28 @@
           </div>
         </aside>
       </div>
+      
+      <%
+   	 	}
+      %>
     </main>
     
-    
-
-  <div id="toast">Placing order...</div>
-
   <script>
+  
     document.getElementById('placeOrderBtn').addEventListener('click', function() {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
       setTimeout(()=> toast.style.display='none', 3000);
       alert("Order created with status: PENDING. Redirecting to UPI payment...");
     });
+    
+    document.querySelectorAll(".method-pill").forEach(pill => {
+    	  pill.addEventListener("click", () => {
+    	    document.querySelectorAll(".method-pill").forEach(p => p.classList.remove("active"));
+    	    pill.classList.add("active");
+    	    pill.querySelector("input").checked = true; // update the hidden radio
+    	  });
+    	});
     
     function showPaymentInterface(method) {
         document.getElementById('debitCardForm').style.display = (method === 'debit') ? 'block' : 'none';
@@ -227,7 +282,7 @@
         var name = document.getElementById('debitCardName').value;
         var expiry = document.getElementById('debitCardExpiry').value;
         var cvv = document.getElementById('debitCardCVV').value;
-        if(cardNumber.length !== 16 || isNaN(cardNumber)) {
+        if(!/^\d{13,19}$/.test(cardNumber) || isNaN(cardNumber)) {
             showToast('Please enter a valid 16-digit Debit Card Number');
             return false;
         }
@@ -251,8 +306,8 @@
         var name = document.getElementById('creditCardName').value;
         var expiry = document.getElementById('creditCardExpiry').value;
         var cvv = document.getElementById('creditCardCVV').value;
-        if(cardNumber.length !== 16 || isNaN(cardNumber)) {
-            showToast('Please enter a valid 16-digit Credit Card Number');
+        if(!/^\d{13,19}$/.test(cardNumber) || isNaN(cardNumber)) {
+            showToast('Please enter a valid Credit Card Number');
             return false;
         }
         if(name.trim() === '') {
@@ -280,12 +335,34 @@
     }
 
     function showToast(msg) {
-        var toast = document.getElementById("toast");
-        toast.innerText = msg;
-        toast.className = "show";
-        setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        var toast_form = document.getElementById("toast-form");
+        toast_form.innerText = msg;
+        toast_form.className = "show";
+        setTimeout(function(){ toast_form.className = toast_form.className.replace("show", ""); }, 3000);
     }
     window.onload = function() { showPaymentInterface('debit'); }
+    
+	// Handline Popup Messages
+    <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
+		<% } %>
+	
+	<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
+	<% } %>
+	
   </script>
 </body>
 </html>

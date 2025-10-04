@@ -5,6 +5,7 @@ Test.class
 com\switchbit\util\DBConnection.class
 com\switchbit\dto\OrderDTO.class
 com\switchbit\dto\UserWithPassword.class
+com\switchbit\controller\payment\ConfirmPendingOrders.class
 com\switchbit\model\Cart.class
 com\switchbit\model\Product.class
 com\switchbit\service\CartService.class
@@ -55,4 +56,5 @@ com\switchbit\controller\payment\BuyNowServlet.class
 com\switchbit\model\Category.class
 com\switchbit\model\CartStatus.class
 com\switchbit\dto\OrderItemDTO.class
+com\switchbit\controller\order\CancelOrderStatus.class
 com\switchbit\dao\ProductDAO.class

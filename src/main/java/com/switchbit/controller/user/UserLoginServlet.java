@@ -103,6 +103,7 @@ public class UserLoginServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath()+"/signin.jsp");
 
         } catch (DataAccessException e) {
+        	e.printStackTrace();
             // DB/connection error
         	if (session!=null)
         		session.setAttribute("errorMessage", e.getMessage());

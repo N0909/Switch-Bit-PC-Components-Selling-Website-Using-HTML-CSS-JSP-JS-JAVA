@@ -158,4 +158,24 @@ public class OrderDAO {
 		}
 	}
 	
+	
+	public List<Order> getOrders(Connection conn) throws SQLException {
+		List<Order> orders = new ArrayList<>();
+		try (Statement stmt = conn.createStatement()){
+			try (ResultSet rs = stmt.executeQuery("SELECT order_id,user_id,order_date,total_amount,order_status,delivered_date");){
+				while (rs.next()) {
+					orders.add(new Order(
+								rs.getString("order_id"),
+								rs.getString("user_id"),
+								rs.getTimestamp("order_date"),
+								rs.getDouble("total_amount"),
+								rs.getString("order_status"),
+								rs.getDate("delivery_date")
+							));
+				}
+			}
+		}
+		return orders;
+	}
+	
 }

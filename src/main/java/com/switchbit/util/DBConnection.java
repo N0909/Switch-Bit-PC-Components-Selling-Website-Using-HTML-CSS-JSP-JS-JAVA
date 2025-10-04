@@ -19,26 +19,17 @@ public class DBConnection {
 			url = properties.getProperty("db.url");
 			user = properties.getProperty("db.username");
 			password = properties.getProperty("db.password");
+			
+			url = url.replace("${DB_URL}", System.getenv("DB_URL"));
+		    user = user.replace("${DB_USER}", System.getenv("DB_USER"));
+		    password = password.replace("${DB_PASSWORD}", System.getenv("DB_PASSWORD"));
+			
 			Class.forName("com.mysql.cj.jdbc.Driver");
 		}catch(Exception e) {
 			throw new RuntimeException("Failed to Load DB config",e);
 		}
 	}
 	
-//	static {
-//        try {
-//            user = "root";
-//            password = "WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa";
-//
-//            // Build JDBC URL
-//            url = "jdbc:"+"mysql://root:WMfTPESucAPwQEXJSyNlWaxzPSzXNbXa@gondola.proxy.rlwy.net:59615/SwitchBitDB"+"?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-//            
-//            // Load MySQL driver
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to load DB config", e);
-//        }
-//    }
 	    
 
 	public static Connection getConnection() throws SQLException {

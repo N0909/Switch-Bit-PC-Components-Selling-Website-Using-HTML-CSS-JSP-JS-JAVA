@@ -129,6 +129,18 @@
   	<description></description>
   	<servlet-class>com.switchbit.controller.payment.ProcessPaymentServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>ConfirmPendingOrders</servlet-name>
+  	<display-name>ConfirmPendingOrders</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.payment.ConfirmPendingOrders</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>CancelOrder</servlet-name>
+  	<display-name>CancelOrder</display-name>
+  	<description></description>
+  	<servlet-class>com.switchbit.controller.order.CancelOrderStatus</servlet-class>
+  </servlet>
   
   
  
@@ -204,6 +216,14 @@
   <servlet-mapping>
   	<servlet-name>ProcessPaymentServlet</servlet-name>
   	<url-pattern>/payment/processpayment</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>ConfirmPendingOrders</servlet-name>
+  	<url-pattern>/payment/pendingorder</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>CancelOrder</servlet-name>
+  	<url-pattern>/orders/cancel</url-pattern>
   </servlet-mapping>
   
   

@@ -8,10 +8,11 @@
 	int total_item = (totalItemObj != null) ? totalItemObj : 0;
 	Product product = (Product) request.getAttribute("product");
 	
-	String message = (String) session.getAttribute("successMessage");
-    if (message != null) {
-        session.removeAttribute("successMessage"); // clear after showing once
-    }
+	
+    String successMessage = (String) session.getAttribute("successMessage");
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+    session.removeAttribute("errorMessage");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,6 +38,12 @@
   		font-size: 0.7rem;
   		font-weight: 600;
   		border: 2px solid white;
+	}
+	form {
+		display:block;	
+	}
+	.product-actions {
+		align-items: flex-start;
 	}
   </style>
   </head>
@@ -116,6 +123,23 @@
       </div>
     </div>
 
+	<%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+
     <div class="main">
       <div class="product-details-page">
         <!-- Breadcrumb -->
@@ -127,7 +151,6 @@
           <span class="breadcrumb-current"><%=product.getProduct_name() %></span>
         </div>
         
-        <div id="toast"><%= (message != null) ? message : "" %></div>
         <div class="product-details-container">
           <div class="product-image-section">
             <div class="main-image">
@@ -147,65 +170,54 @@
             </div>
 
             <div class="product-description">
+              <h3>In stock: </h3>
+              <p><%=product.getStock_quantity() %></p>
               <h3>Description</h3>
               <p><%=product.getDescription() %></p>
             </div>
 
-
+			<% if (product.getStock_quantity()<=0) { %>
+                    <div><h3>Out of Stock</h3></div>
+            <% } else{ %>
             <div class="product-actions">
               <div class="quantity-selector">
                 <label for="quantity">Quantity:</label>
                 <div class="quantity-controls">
                   <button class="quantity-btn minus" type="button">-</button>
-                  <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" class="quantity-input">
+                  <input type="number" id="quantity" name="quantity" value="1" min="1" max=<%=product.getStock_quantity() %> class="quantity-input">
                   <button class="quantity-btn plus" type="button">+</button>
                 </div>
-              </div>
+              </div>      	
+	          <div class="action-buttons">
+	               <% if (user != null) { %>
+	                  <form action="<%=request.getContextPath()%>/payment/buynow" method="post">
+	                  	<input type="hidden" name="product-id" value=<%=product.getProduct_id() %>>
+	                  	<input id="product_quan_buy_now" type="hidden" name="product-quan" value=1>
+	                  	<button class="buy-now-btn" type="submit">Buy Now</button>
+	                  </form>
+	                  <% } else { %>
+	                    <button class="buy-now-btn" onclick="alert(`please log in first`)">Buy Now</button>
+	                <% } %>
+	                  	
+	                <% if (user != null) { %>
+	                  	<form action="<%=request.getContextPath() %>/cart" method="post">
+	                  		<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
+	                  		<input id="product_quan" type="hidden" name="product_quan" value=1>
+	                    	<button class="add-to-cart-btn" type="submit" >Add to Cart</button>
+	                  	</form>
+	                <% } else { %>
+	                    <button class="add-to-cart-btn" onclick="alert(`please log in first`)">Add to Cart</button>
+	                <% } %>
+               <%} %>
 
-              <div class="action-buttons">
-                <button class="btn-buy-now-large">Buy Now</button>
-                <% if (user != null) { %>
-                  		<form action="<%=request.getContextPath() %>/cart" method="post">
-                  			<input type="hidden" name="product_id" value=<%=product.getProduct_id() %>>
-                  			<input type="hidden" id="product_quan" name="product_quan" value=1>
-                    		<button class="btn-add-cart" type="submit" >Add to Cart</button>
-                  		</form>
-                  	  <% } else { %>
-                    	<button class="btn-add-cart" onclick="alert(`please log in first`)">Add to Cart</button>
-                <% } %>
-              </div>
-            </div>
-
-            <div class="product-shipping">
-              <div class="shipping-info">
-                <div class="shipping-item">
-                  <span class="shipping-icon">🚚</span>
-                  <div class="shipping-text">
-                    <strong>Free Shipping</strong>
-                    <p>On orders over ₹5,000</p>
-                  </div>
-                </div>
-                <div class="shipping-item">
-                  <span class="shipping-icon">🔄</span>
-                  <div class="shipping-text">
-                    <strong>Easy Returns</strong>
-                    <p>30-day return policy</p>
-                  </div>
-                </div>
-                <div class="shipping-item">
-                  <span class="shipping-icon">🛡️</span>
-                  <div class="shipping-text">
-                    <strong>Warranty</strong>
-                    <p>3-year manufacturer warranty</p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
 
+    
+    </div>
+    
     <div class="footer">
       <div class="footer-content">
         <div class="support">
@@ -239,7 +251,6 @@
       <div class="footer-bottom">
         <p>© 2025 SwitchBit. All Rights Reserved.</p>
       </div>
-    </div>
     </div>
     
     <script>
@@ -311,6 +322,7 @@
         // Product details functionality
         const quantityInput = document.getElementById('quantity');
         const productQuan = document.getElementById('product_quan');
+        const productQuanBuyNow = document.getElementById('product_quan_buy_now');
         const minusBtn = document.querySelector('.quantity-btn.minus');
         const plusBtn = document.querySelector('.quantity-btn.plus');
         const buyNowBtn = document.querySelector('.btn-buy-now-large');
@@ -324,6 +336,7 @@
           if (currentValue > 1) {
             quantityInput.value = currentValue - 1;
             productQuan.value = currentValue-1;
+            productQuanBuyNow.value = currentValue-1;
           }
         });
 
@@ -333,17 +346,30 @@
           if (currentValue < maxValue) {
             quantityInput.value = currentValue + 1;
             productQuan.value = currentValue+1;
+            productQuanBuyNow.value = currentValue+1;
           }
         });
         
-        <% if (message != null) { %>
-			var toast = document.getElementById("toast");
-			toast.className = "show";
-			setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        <% if (successMessage != null) { %>
+			var successtoast = document.getElementById("toast-success");
+			successtoast.className = "show";
+			successtoast.style.visibility = "visible";
+			setTimeout(function(){
+				successtoast.className = successtoast.className.replace("show", "");
+				successtoast.style.visibility = "hidden"
+			}, 6000);
 		<% } %>
-		
-		
-        
+	
+		<% if (errorMessage != null) { %>
+			var errortoast = document.getElementById("toast-error");
+			errortoast.className = "show";
+			errortoast.style.visibility = "visible";
+			setTimeout(function(){
+				errortoast.className = errortoast.className.replace("show", ""); 
+				errortoast.style.visibility = "hidden";
+			}, 6000);
+		<% } %>
+		 
       });
 
     </script>

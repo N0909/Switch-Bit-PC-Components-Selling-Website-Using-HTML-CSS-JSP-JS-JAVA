@@ -74,7 +74,7 @@ public class ProductService {
 	 * @throws RollBackException        if rollback fails after an update error.
 	 * @throws CloseConnectionException if closing the connection fails.
 	 */
-	public Product addProduct(Product product) throws DataAccessException, RollBackException, CloseConnectionException {
+	public void addProduct(Product product) throws DataAccessException, RollBackException, CloseConnectionException {
 		Connection conn = null;
 
 		try {
@@ -86,6 +86,7 @@ public class ProductService {
 			int currentId = IdGeneratorDAO.getCurrentIdVal(conn, "Product");
 			String productId = MiscUtil.idGenerator("PROD000", currentId);
 			product.setProduct_id(productId);
+			product.setLast_updated(new Timestamp(System.currentTimeMillis()));
 
 			// Step 3: Insert product
 			productDAO.addProduct(conn, product);
@@ -96,8 +97,7 @@ public class ProductService {
 			// Step 5: Commit transaction
 			conn.commit();
 
-			return productDAO.getProduct(conn, product.getProduct_id());
-
+			
 		} catch (SQLException e) {
 			// Rollback if something fails
 			if (conn != null) {
@@ -133,7 +133,7 @@ public class ProductService {
 	 * @throws RollBackException        if rollback fails after an update error.
 	 * @throws CloseConnectionException if closing the connection fails.
 	 */
-	public Product updateProduct(Product product)
+	public void updateProduct(Product product)
 			throws DataAccessException, CloseConnectionException, RollBackException {
 
 		Connection conn = null;
@@ -142,15 +142,16 @@ public class ProductService {
 			// 1. Get connection and begin transaction
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
-
+			
+			product.setLast_updated(new Timestamp(System.currentTimeMillis()));
+			
 			// 2. Delegate actual update to DAO
 			productDAO.updateProduct(conn, product);
 
 			// 3. Commit transaction on success
 			conn.commit();
 
-			return productDAO.getProduct(conn, product.getProduct_id());
-
+			
 		} catch (SQLException e) {
 			// 4. Rollback if something fails
 			if (conn != null) {
@@ -239,7 +240,7 @@ public class ProductService {
 		try (Connection conn = DBConnection.getConnection()){
 			return productDAO.getCategories(conn);
 		}catch(SQLException e) {
-			throw new DataAccessException("failed to retrieve Categories");
+			throw new DataAccessException("failed to retrieve Categories", e);
 		}
 	}
 	
@@ -248,7 +249,7 @@ public class ProductService {
 		try(Connection conn = DBConnection.getConnection()){
 			return productDAO.getCategory(conn, category_id);
 		}catch(SQLException e) {
-			throw new DataAccessException("failed to retrive Category with id: "+category_id);
+			throw new DataAccessException("failed to retrive Category with id: "+category_id, e);
 		}
 	}
 	
@@ -286,6 +287,14 @@ public class ProductService {
 			return productDAO.getProductsByCategory(conn, categoryId, page, pageSize);
 		}catch(SQLException e) {
 			throw new DataAccessException("failed to get products with category: "+categoryId);
+		}
+	}
+	
+	public List<Product> getLowStockProduct() throws DataAccessException{
+		try (Connection conn = DBConnection.getConnection()){
+			return productDAO.getLowStockProduct(conn);
+		}catch(SQLException e) {
+			throw new DataAccessException("failed to get low stock products");
 		}
 	}
 

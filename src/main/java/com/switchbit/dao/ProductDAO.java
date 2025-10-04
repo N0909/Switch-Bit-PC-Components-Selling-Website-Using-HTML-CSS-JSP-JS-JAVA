@@ -230,12 +230,15 @@ public class ProductDAO {
 	public Category getCategory(Connection conn, String category_id) throws SQLException {
 		Category category = null;
 		try (CallableStatement getCategory = conn.prepareCall("{call getCategory(?)}")){
+			getCategory.setString(1,category_id);
 			try(ResultSet rs = getCategory.executeQuery()){
+				if (rs.next()) {					
 				category = new Category(
 							rs.getString("category_id"),
 							rs.getString("category_name"),
 							rs.getString("category_image")
 						);	
+				}
 			}
 		}
 		return category;
@@ -354,4 +357,48 @@ public class ProductDAO {
 			return new PaginatedResult<>(products, page, pageSize, total);
 		}
 	}
+	
+	public List<Product> getLowStockProduct(Connection conn) throws SQLException{
+		List<Product> products = new ArrayList<Product>();
+		String sql = "SELECT "
+		           + "product_id, "
+		           + "product_name, "
+		           + "description, "
+		           + "price, "
+		           + "stock_quantity, "
+		           + "category.category_id, "
+		           + "product_img, "
+		           + "last_updated, "
+		           + "category_name, "
+		           + "category_image "
+		           + "FROM product "
+		           + "JOIN category ON category.category_id = product.category_id "
+		           + "WHERE stock_quantity < 10";
+
+		try (Statement stmt = conn.createStatement();
+			  ResultSet rs = stmt.executeQuery(sql)){
+			while(rs.next()) {
+				Category category = new Category (
+						rs.getString("category_id"),
+						rs.getString("category_name"),
+						rs.getString("category_image")
+				);
+	            Product product = new Product(
+	                rs.getString("product_id"),
+	                rs.getString("product_name"),
+	                rs.getString("description"),
+	                rs.getDouble("price"),
+	                rs.getInt("stock_quantity"),
+	                category,
+	                rs.getString("product_img"),
+	                rs.getTimestamp("last_updated")
+	            );
+	            products.add(product);
+			}
+		}
+		return products;
+	}
+	
+	
+	
 }

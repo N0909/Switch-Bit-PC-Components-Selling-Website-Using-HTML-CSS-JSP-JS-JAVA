@@ -1,0 +1,62 @@
+@startuml
+'---------------------------
+' PlantUML - Payment Flow
+'---------------------------
+
+
+skinparam defaultFontSize 18
+skinparam ArrowFontSize 20
+
+' ---------------------------
+' Model Layer
+' ---------------------------
+package "Model Layer" {
+    class Payment {
+        - paymentId: String
+        - orderId: String
+        - userId: String
+        - amount: double
+        - paymentMethod: String
+        - status: String
+        + getters/setters
+    }
+}
+
+' ---------------------------
+' DAO Layer
+' ---------------------------
+package "DAO Layer" {
+    class PaymentDAO {
+        + addPayment(payment: Payment)
+        + updateStockAfterPayment(orderId:String)
+    }
+}
+
+' ---------------------------
+' Service Layer
+' ---------------------------
+package "Service Layer" {
+    class PaymentService {
+        - paymentDAO: PaymentDAO
+        + processPayment(payment: Payment)
+    }
+}
+
+' ---------------------------
+' Controller Layer
+' ---------------------------
+package "Controller Layer" {
+    class PaymentController {
+        - paymentService: PaymentService
+        + doPost(request, response)
+    }
+}
+
+' ---------------------------
+' Relationships showing payment flow
+' ---------------------------
+PaymentController --> PaymentService : calls makePayment()
+PaymentService --> PaymentDAO : calls processPayment()
+PaymentDAO --> Payment : maps to
+
+@enduml

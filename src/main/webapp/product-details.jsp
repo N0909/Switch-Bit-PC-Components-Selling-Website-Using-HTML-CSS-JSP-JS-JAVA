@@ -162,7 +162,7 @@
           <div class="product-info-section">
             <div class="product-header">
               <h1 class="product-title"><%=product.getProduct_name() %></h1>
-              <div class="product-category"><%=product.getCategory().getCategory_name() %></div>
+              <div class="product-category"><%=product.getCategory().getCategory_name()%></div>
             </div>
 
             <div class="product-price">
