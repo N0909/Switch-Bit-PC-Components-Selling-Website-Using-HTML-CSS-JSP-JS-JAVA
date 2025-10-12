@@ -6,10 +6,6 @@ import com.switchbit.model.CartItem;
 
 /**
  * Utility class for miscellaneous helper functions.
- * Provides ID generation methods for prefixed, zero-padded identifiers.
- *
- * Example: 
- *   Input: prefix="USR", id="USR0009" → Output: "USR0010"
  */
 public class MiscUtil {
 
@@ -67,12 +63,23 @@ public class MiscUtil {
         return prefix + paddedNumber;
     }
     
-    
+    /**
+     * Calculates the total cost of all items in the cart.
+     * 
+     * @param dto The CartDTO object containing all cart items and their details
+     * @return total The calculated total price of the cart
+     */
     public static double CalcuateTotal(CartDTO dto) {
-    	double total = 0;
-    	for (CartItemDTO item : dto.getItems()) {
-    		total += item.getCartItem().getQuantity()*item.getProduct().getPrice();
-    	}
-    	return total;
+        double total = 0; // Variable to store the total cart value
+
+        // Loop through each item in the cart
+        for (CartItemDTO item : dto.getItems()) {
+            // Multiply product price by its quantity and add to total
+            total += item.getCartItem().getQuantity() * item.getProduct().getPrice();
+        }
+
+        // Return the final calculated total
+        return total;
     }
+
 }

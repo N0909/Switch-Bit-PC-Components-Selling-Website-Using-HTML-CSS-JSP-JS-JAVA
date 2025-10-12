@@ -30,7 +30,7 @@
           <li><a href="<%=request.getContextPath()%>/about.jsp">About</a></li>
           <li><a href="<%=request.getContextPath()%>/signup.jsp">Sign Up</a></li>
           <li class="active"><a href="<%=request.getContextPath()%>/signin.jsp">Sign In</a></li>
-          <li><a href="<%=request.getContextPath()%>/contact.jsp">Contact</a></li>
+          <li><a href="<%=request.getContextPath()%>/report.jsp">Report</a></li>
         </ul>
       </div>
 

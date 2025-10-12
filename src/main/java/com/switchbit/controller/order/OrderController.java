@@ -9,12 +9,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.model.*;
 import com.switchbit.service.OrderService;
 import com.switchbit.exceptions.*;
 import com.switchbit.dto.*;
 
+@WebServlet("/orders")
 public class OrderController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private OrderService service;
@@ -33,11 +35,11 @@ public class OrderController extends HttpServlet {
 			response.sendRedirect(request.getContextPath()+"/signin.jsp");
 		try {
 			List<Order> orders = service.getOrders(user);
-			session.setAttribute("orders", orders);
-			response.sendRedirect(request.getContextPath()+"/orders.jsp");
+			request.setAttribute("orders", orders);
+			request.getRequestDispatcher("/orders.jsp").forward(request, response);
 		}catch(DataAccessException e) {
 			session.setAttribute("errorMessage", e.getMessage());
-			response.sendRedirect(request.getContextPath()+"/orders.jsp");
+			response.sendRedirect(request.getContextPath()+"/orders");
 		}
 	}
 

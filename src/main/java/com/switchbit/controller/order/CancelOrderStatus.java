@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.exceptions.CloseConnectionException;
 import com.switchbit.exceptions.DataAccessException;
@@ -12,6 +13,7 @@ import com.switchbit.exceptions.RollBackException;
 import com.switchbit.service.OrderService;
 
 
+@WebServlet("/orders/cancel")
 public class CancelOrderStatus extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private OrderService orderService;

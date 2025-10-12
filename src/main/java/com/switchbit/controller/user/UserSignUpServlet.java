@@ -23,6 +23,7 @@ import com.switchbit.service.UserService;
  * success -> redirect to login/signin page
  * failure -> redirect to signup page
  */
+@WebServlet("/user/signup")
 public class UserSignUpServlet extends HttpServlet {
 
     private UserService userService;

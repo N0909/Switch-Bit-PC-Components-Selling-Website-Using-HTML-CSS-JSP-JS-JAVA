@@ -14,11 +14,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import jakarta.servlet.annotation.*;
 
 /*
  * Handles UserUpdate request for users
  */
+
+@WebServlet("/user/update")
 public class UserUpdateServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserService userService;

@@ -9,12 +9,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.model.*;
 import com.switchbit.service.OrderService;
 import com.switchbit.exceptions.*;
 import com.switchbit.dto.*;
 
+@WebServlet("/orders/orderdetail")
 public class OrderDetailsController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private OrderService service;
@@ -28,18 +30,13 @@ public class OrderDetailsController extends HttpServlet {
 		String order_id = request.getParameter("order-id");
 		
 		try {
-			List<OrderItemDTO> items =null;
-			Order order = service.getOrder(order_id);
-			if (order!=null) {				
-				items = service.getOrderItems(order);
-				request.setAttribute("order", order);
-			}
-			
-			request.setAttribute("order-items", items);
+			request.setAttribute("order-details", service.getOrderDetails(order_id));;
 			request.getRequestDispatcher("/order-details.jsp").forward(request, response);
 		} catch (DataAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			String referer = request.getHeader("referer");
+			request.getSession().setAttribute("errorMessage", e.getMessage());
+			response.sendRedirect(referer);
 		}
 	}
 

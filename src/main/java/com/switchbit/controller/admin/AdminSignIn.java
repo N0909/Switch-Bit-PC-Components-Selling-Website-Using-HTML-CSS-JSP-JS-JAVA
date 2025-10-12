@@ -5,12 +5,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.exceptions.*;
 import com.switchbit.model.Admin;
 import com.switchbit.service.AdminService;
 
 
+
+@WebServlet("/admin/signin")
 public class AdminSignIn extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private AdminService adminService;

@@ -114,7 +114,7 @@
 
     <div class="main">
       <!-- Featured Products Section -->
-      <%
+    <%
 		if (successMessage != null) {
 	%>
 		<div id="toast-success"><%= successMessage %></div>
@@ -295,7 +295,7 @@
         }
         <% } %>
              
-        	<% if (successMessage != null) { %>
+        <% if (successMessage != null) { %>
 			var successtoast = document.getElementById("toast-success");
 			successtoast.className = "show";
 			successtoast.style.visibility = "visible";

@@ -14,7 +14,7 @@ public class OrderDAO {
 	public Order getOrder(Connection conn, String order_id) throws SQLException{
 		Order order = null;
 		try (CallableStatement cs = conn.prepareCall("{call getOrder(?)}");){
-			cs.setString(1, order_id);
+			cs.setString(1, order_id);;
 			try(ResultSet rs = cs.executeQuery()){
 				if (rs.next()) {
 					order = new Order(
@@ -37,9 +37,9 @@ public class OrderDAO {
 	public List<Order> getOrders(Connection conn, User user) throws SQLException {
 	    List<Order> orders = new ArrayList<Order>();
 
-	    try (CallableStatement cs = conn.prepareCall("{call getOrders(?)}");) {
+	    try (CallableStatement cs = conn.prepareCall("{call getOrdersByUser(?)}");) {
 	        cs.setString(1, user.getUserId());
-
+	        
 	        try (ResultSet rs = cs.executeQuery();) {
 	            while (rs.next()) {
 	                Order order = new Order(
@@ -55,6 +55,47 @@ public class OrderDAO {
 	        }
 	    }
 	    return orders;
+	}	
+	
+	
+	public List<Order> getOrders(Connection conn, String order_status) throws SQLException {
+		List<Order> orders = new ArrayList<>();
+		try (CallableStatement cs = conn.prepareCall("{call getOrders(?)}")){
+			cs.setString(1, order_status);
+			try (ResultSet rs = cs.executeQuery();){
+				while (rs.next()) {
+					orders.add(new Order(
+								rs.getString("order_id"),
+								rs.getString("user_id"),
+								rs.getTimestamp("order_date"),
+								rs.getDouble("total_amount"),
+								rs.getString("order_status"),
+								rs.getDate("delivered_date")
+							));
+				}
+			}
+		}
+		return orders;
+	}
+	
+	public List<Order> getOrders(Connection conn) throws SQLException {
+		List<Order> orders = new ArrayList<>();
+		try (CallableStatement cs = conn.prepareCall("{call getOrders(?)}")){
+			cs.setString(1, "");
+			try (ResultSet rs = cs.executeQuery();){
+				while (rs.next()) {
+					orders.add(new Order(
+								rs.getString("order_id"),
+								rs.getString("user_id"),
+								rs.getTimestamp("order_date"),
+								rs.getDouble("total_amount"),
+								rs.getString("order_status"),
+								rs.getDate("delivered_date")
+							));
+				}
+			}
+		}
+		return orders;
 	}
 	
 	/*
@@ -159,23 +200,66 @@ public class OrderDAO {
 	}
 	
 	
-	public List<Order> getOrders(Connection conn) throws SQLException {
-		List<Order> orders = new ArrayList<>();
-		try (Statement stmt = conn.createStatement()){
-			try (ResultSet rs = stmt.executeQuery("SELECT order_id,user_id,order_date,total_amount,order_status,delivered_date");){
-				while (rs.next()) {
-					orders.add(new Order(
-								rs.getString("order_id"),
-								rs.getString("user_id"),
-								rs.getTimestamp("order_date"),
-								rs.getDouble("total_amount"),
-								rs.getString("order_status"),
-								rs.getDate("delivery_date")
-							));
+	public OrderDetailsDTO getOrderDetails(Connection conn, String orderId) throws SQLException {
+		OrderDetailsDTO dto = new OrderDetailsDTO();
+		User user = null;
+		Order order = null;
+		Payment payment = null;
+		List<OrderItemDTO> orderItems = new ArrayList();
+		try (CallableStatement cs = conn.prepareCall("{call getOrderDetails(?)}");){
+			cs.setString(1, orderId);
+			boolean firstrow = true;
+			try (ResultSet rs = cs.executeQuery()){
+				while(rs.next()) {
+					if (firstrow) {
+						
+						user = new User();
+						user.setUserId(rs.getString("user_id"));
+						user.setUserName(rs.getString("name"));
+						user.setUserEmail(rs.getString("email"));
+						user.setUserPhone(rs.getString("phone"));
+						user.setUserAddress(rs.getString("address"));
+						user.setRegDate(rs.getTimestamp("reg_date"));
+						
+						order = new Order();
+						order.setOrder_id(rs.getString("order_id"));
+						order.setOrder_date(rs.getTimestamp("order_date"));
+						order.setOrder_status(rs.getString("order_status"));
+						
+						payment = new Payment();
+						if (rs.getString("payment_id")!=null) {
+							payment.setPaymentId(rs.getString("payment_id"));
+							payment.setAmount(rs.getDouble("amount"));
+							payment.setPaymentDate(rs.getTimestamp("payment_date"));
+							payment.setPaymentMethod(Payment.PaymentMethod.fromString(rs.getString("payment_method")));
+						}
+						
+						
+						dto.setOrder(order);
+						dto.setUser(user);
+						dto.setPayment(payment);
+						
+						firstrow = false;
+						
+					}
+					
+					OrderItem item = new OrderItem();
+					item.setOrder_item_id(rs.getString("order_item_id"));
+					item.setOrder_id(rs.getString("order_id"));
+					item.setProduct_id(rs.getString("product_id"));
+					item.setQuantity(rs.getInt("quantity"));
+					
+					Product product = new Product();
+					product.setProduct_id(rs.getString("product_id"));
+					product.setProduct_name(rs.getString("product_name"));
+					product.setPrice(rs.getDouble("price"));
+					product.setStock_quantity(rs.getInt("stock_quantity"));
+					
+					orderItems.add(new OrderItemDTO(item, product));
 				}
-			}
+				dto.setOrderItemDTO(orderItems);			}
 		}
-		return orders;
+		return dto;
 	}
-	
+
 }

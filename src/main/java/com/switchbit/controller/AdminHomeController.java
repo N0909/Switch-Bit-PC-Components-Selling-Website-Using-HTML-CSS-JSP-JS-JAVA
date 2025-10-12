@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.exceptions.*;
 import com.switchbit.dao.*;
@@ -14,6 +15,7 @@ import com.switchbit.service.*;
 /**
  * Servlet implementation class AdminHomeController
  */
+@WebServlet("/admin/home")
 public class AdminHomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	ProductService productService;

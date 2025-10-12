@@ -12,7 +12,9 @@ import com.switchbit.model.*;
 import com.switchbit.service.*;
 
 
+
 @MultipartConfig
+@WebServlet("/admin/product/update")
 public class AdminUpdateProduct extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProductService productService;
@@ -31,13 +33,17 @@ public class AdminUpdateProduct extends HttpServlet {
 		int product_stock = Integer.parseInt(request.getParameter("stock-quantity"));
 		String category_id = request.getParameter("category-id");
 		
+		String referer = request.getHeader("referer");
+		
 		
 		Part filePart = request.getPart("product-img");	
 		String filename = filePart.getSubmittedFileName();
 		String dbPath = null;
 		
+		Category category;
 		try {
-			Category category = productService.getCategory(category_id);
+			category = productService.getCategory(category_id);
+			
 			if (filename!=null && !filename.isEmpty()) {
 				
 			
@@ -56,7 +62,6 @@ public class AdminUpdateProduct extends HttpServlet {
 				
 			}
 			
-			
 			Product product = new Product();
 			
 			product.setProduct_id(product_id);
@@ -65,18 +70,26 @@ public class AdminUpdateProduct extends HttpServlet {
 			product.setPrice(product_price);
 			product.setStock_quantity(product_stock);
 			product.setCategory(category);
+			
 			if (dbPath!=null) {				
 				product.setProduct_img(dbPath);
 			}
 			
-			
 			productService.updateProduct(product);
+			request.getSession().setAttribute("successMessage", product_name+" updated successfully");
 			
-			response.sendRedirect(request.getContextPath()+"/admin/home");
+			response.sendRedirect(referer);
 			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
+			} catch (DataAccessException e) {
+				request.getSession().setAttribute("errorMessage", e.getMessage());
+				response.sendRedirect(referer);
+			} catch (CloseConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (RollBackException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		
 		
 		

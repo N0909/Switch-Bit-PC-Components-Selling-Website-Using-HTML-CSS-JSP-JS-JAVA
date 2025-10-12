@@ -64,7 +64,7 @@
             <li><a href="<%= request.getContextPath() %>/signup.jsp">Sign Up</a></li>
             <li><a href="<%= request.getContextPath() %>/signin.jsp">Sign In</a></li>
           <% } %>
-          <li><a href="">Contact</a></li>
+          <li><a href="<%=request.getContextPath()%>/report.jsp">Report</a></li>
         </ul>
       </div>
     </div>
@@ -248,6 +248,8 @@
     </main>
     
   <script>
+  
+	const contextPath = "<%= request.getContextPath() %>" ;
   
     document.getElementById('placeOrderBtn').addEventListener('click', function() {
       const toast = document.getElementById('toast');

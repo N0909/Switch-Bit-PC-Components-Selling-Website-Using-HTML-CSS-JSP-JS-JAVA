@@ -1,11 +1,13 @@
 package com.switchbit.controller.product;
 
 import java.io.IOException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.model.Product;
 import com.switchbit.exceptions.DataAccessException;
@@ -16,6 +18,7 @@ import com.switchbit.util.PaginatedResult;
 /**
  * Fetching all the page from database
  */
+@WebServlet("/product/products")
 public class ProductListServlet extends HttpServlet {
 	private ProductService productService;
 	

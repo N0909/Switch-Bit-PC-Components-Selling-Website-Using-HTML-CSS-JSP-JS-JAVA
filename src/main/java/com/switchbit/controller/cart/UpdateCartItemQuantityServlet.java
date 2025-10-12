@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.model.*;
 import com.switchbit.service.CartService;
@@ -14,7 +15,7 @@ import com.switchbit.dto.*;
 /**
  * Servlet implementation class UpdateCartItemServlet
  */
-//@WebServlet("/cart/updateCartItem")
+@WebServlet("/cart/updateCartItemQuantity")
 public class UpdateCartItemQuantityServlet extends HttpServlet {
 	private CartService service;
 

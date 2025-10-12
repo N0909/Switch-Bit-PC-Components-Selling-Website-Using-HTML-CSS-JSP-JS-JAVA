@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.model.*;
 import com.switchbit.dao.*;
@@ -14,7 +15,7 @@ import com.switchbit.exceptions.*;
 import com.switchbit.service.*;
 import com.switchbit.dto.*;
 
-
+@WebServlet("/payment/pendingorder")
 public class ConfirmPendingOrders extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private OrderService orderService;

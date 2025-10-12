@@ -4,7 +4,7 @@
 <%@ page import="com.switchbit.dto.*" %>
 <%@ page import="java.sql.Timestamp" %>
 <%
-    List<Order> orders = (List<Order>) session.getAttribute("orders");
+    List<Order> orders = (List<Order>) request.getAttribute("orders");
 	User user  = (User) session.getAttribute("user");
 	if (user == null){
     	response.sendRedirect("signin.jsp");
@@ -64,33 +64,7 @@
         .confirm-payment:hover{
         	transform: translateY(-2px);
   			box-shadow: 0 6px 20px rgba(44, 90, 160, 0.4);
-        }
-        #toast-success{
-        	visibility: hidden;
-		    min-width: 200px;
-		    margin-left: -100px;
-		    background-color: #333;
-		    color: #fff;
-		    text-align: center;
-		    border-radius: 5px;
-		    padding: 10px;
-		    position: fixed;
-		    z-index: 1;
-		    left: 50%;
-			bottom: 30px;
-			font-size: 14px;
-        }
-        
-        #toast-success.show {
-			visibility: visible;
-			-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-			animation: fadein 0.5s, fadeout 0.5s 2.5s;
-		}
-		@-webkit-keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-		@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-		@-webkit-keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-		@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-			        
+        }      
     </style>
 </head>
 <body>
@@ -110,7 +84,7 @@
             <li><a href="<%= request.getContextPath() %>/signup.jsp">Sign Up</a></li>
             <li><a href="<%= request.getContextPath() %>/signin.jsp">Sign In</a></li>
           <% } %>
-          <li><a href="">Contact</a></li>
+          <li><a href="<%=request.getContextPath()%>/report.jsp">Report</a></li>
         </ul>
       </div>
 
@@ -146,6 +120,10 @@
             <div class="dropdown-item">
               <span class="dropdown-icon">📦</span>
               <span>Your Orders</span>
+            </div>
+            <div class="dropdown-item">
+              <span class="dropdown-icon">💬</span>
+              <span>Submitted Reports</span>
             </div>
             <div class="dropdown-item">
               <span class="dropdown-icon">⚙️</span>
@@ -229,7 +207,11 @@
                         		</form>
                         	</td>
                         <% } else {%>
-                        	<td><%= order.getDelivery_date() %></td> 
+                        	<% if (order.getDelivery_date()!=null) {%>
+                        	<td><%= order.getDelivery_date() %></td>
+                        	<% } else { %>
+                        		<td>-<td>
+                        	<% } %> 
                         <% } %>
                     </tr>
                 <%
@@ -242,87 +224,21 @@
         %>
     </div>
     
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        <% if (user != null) { %>
-        const profileTrigger = document.querySelector('.profile-trigger');
-        const profileDropdown = document.querySelector('.profile-dropdown');
-        const accountContainer = document.querySelector('.account-container');
-        
-        if (profileTrigger && profileDropdown && accountContainer) {
-          // Toggle dropdown on click
-          profileTrigger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const isVisible = profileDropdown.style.opacity === '1';
-            
-            if (isVisible) {
-              profileDropdown.style.opacity = '0';
-              profileDropdown.style.visibility = 'hidden';
-              profileDropdown.style.transform = 'translateY(-10px)';
-            } else {
-              profileDropdown.style.opacity = '1';
-              profileDropdown.style.visibility = 'visible';
-              profileDropdown.style.transform = 'translateY(0)';
-            }
-          });
-          
-          // Close dropdown when clicking outside
-          document.addEventListener('click', function(e) {
-            if (!accountContainer.contains(e.target)) {
-              profileDropdown.style.opacity = '0';
-              profileDropdown.style.visibility = 'hidden';
-              profileDropdown.style.transform = 'translateY(-10px)';
-            }
-          });
-          
-          // Handle dropdown item clicks
-          const dropdownItems = document.querySelectorAll('.dropdown-item');
-          dropdownItems.forEach(item => {
-            item.addEventListener('click', function() {
-              const text = this.querySelector('span:last-child').textContent;
-              
-              // Handle different actions
-              if (text === 'Your Orders') {
-                window.location.href = '<%= request.getContextPath() %>/orders.jsp';
-              } else if (text === 'Manage Account') {
-                window.location.href = '<%= request.getContextPath() %>/profile.jsp';
-              } else if (text === 'Logout') {
-                if (confirm('Are you sure you want to logout?')) {
-                  window.location.href = '<%= request.getContextPath() %>/user/logout';
-                }
-              }
-              
-              // Close dropdown after action
-              profileDropdown.style.opacity = '0';
-              profileDropdown.style.visibility = 'hidden';
-              profileDropdown.style.transform = 'translateY(-10px)';
-            });
-          });
-        }
-        <% } %>
-        
-    	// Handline Popup Messages
-        <% if (successMessage != null) { %>
-			var successtoast = document.getElementById("toast-success");
-			successtoast.className = "show";
-			successtoast.style.visibility = "visible";
-			setTimeout(function(){
-				successtoast.className = successtoast.className.replace("show", "");
-				successtoast.style.visibility = "hidden"
-			}, 6000);
-		<% } %>
+    <% if (user!=null) {%>
+	    <script src="<%=request.getContextPath()%>/js/profile-dropdown.js"></script> 
+    <% } %>
+    
+    <% if (successMessage != null) { %>
+		<script src="<%=request.getContextPath()%>/js/successMessage.js" ></script>
+	<% } %>
 	
-		<% if (errorMessage != null) { %>
-			var errortoast = document.getElementById("toast-error");
-			errortoast.className = "show";
-			errortoast.style.visibility = "visible";
-			setTimeout(function(){
-				errortoast.className = errortoast.className.replace("show", ""); 
-				errortoast.style.visibility = "hidden";
-			}, 6000);
-		<% } %>
-      });
-    </script>
+	<% if (errorMessage != null) { %>
+		<script src="<%=request.getContextPath()%>/js/errorMessage.js" ></script>
+	<% } %>
+	
+	<script>
+    	const contextPath = "<%= request.getContextPath() %>" ;
+	</script>
     
 </body>
 </html>

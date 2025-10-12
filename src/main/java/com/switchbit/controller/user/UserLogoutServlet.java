@@ -7,9 +7,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.annotation.*;
 /**
  * Handles Logout request
  */
+
+@WebServlet("/user/logout")
 public class UserLogoutServlet extends HttpServlet implements Servlet {
 	
 	@Override

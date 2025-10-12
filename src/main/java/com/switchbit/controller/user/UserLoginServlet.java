@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import jakarta.servlet.annotation.*;
 /**
  * Handles login requests for users.
  * Responsibilities:
@@ -25,6 +25,8 @@ import jakarta.servlet.http.HttpSession;
  * 3. On success → create session and redirect.
  * 4. On failure → return error message to login.jsp.
  */
+
+@WebServlet("/user/login")
 public class UserLoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserService userService;

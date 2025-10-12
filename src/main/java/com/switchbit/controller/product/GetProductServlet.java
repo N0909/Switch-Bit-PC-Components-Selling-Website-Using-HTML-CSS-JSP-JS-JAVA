@@ -2,6 +2,7 @@ package com.switchbit.controller.product;
 
 import java.io.IOException;
 
+
 import com.switchbit.service.ProductService;
 
 import jakarta.servlet.ServletConfig;
@@ -9,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.model.Product;
 import com.switchbit.util.*;
@@ -16,6 +18,8 @@ import com.switchbit.exceptions.*;
 /**
  * Fetch ProductByProductId from database
  */
+
+@WebServlet("/product/getProduct")
 public class GetProductServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProductService service;

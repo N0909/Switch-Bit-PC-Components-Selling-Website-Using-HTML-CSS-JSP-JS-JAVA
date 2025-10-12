@@ -1,3 +1,26 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.switchbit.model.*" %>
+<%@ page import="java.util.List" %>
+
+<%
+	Admin admin = (Admin) session.getAttribute("admin");
+
+	if (admin==null){
+		response.sendRedirect(request.getContextPath()+"/admin/admin-signin.jsp");
+		return;
+	}
+	
+	String errorMessage = (String) session.getAttribute("errorMessage");
+	String successMessage = (String) session.getAttribute("successMessage");
+	session.removeAttribute("errorMessage");
+	session.removeAttribute("successMessage");
+	
+	
+	List<Product> products = (List<Product>) request.getAttribute("products");
+	List<Category> categories = (List<Category>) request.getAttribute("categories");
+
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,25 +45,6 @@
             margin-bottom: 30px;
             text-align: center;
         }
-        .add-btn {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 14px 28px;
-            font-size: 18px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
-            display: block;
-            margin-left: auto;
-        }
-        .add-btn:hover {
-            background: #1e40af;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -57,31 +61,6 @@
         }
         tr:nth-child(even) {
             background: #f9f9f9;
-        }
-        .action-btn {
-            border: none;
-            border-radius: 6px;
-            padding: 9px 18px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            margin-right: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            transition: background 0.2s;
-        }
-        .edit-btn {
-            background: #2563eb;
-            color: #fff;
-        }
-        .edit-btn:hover {
-            background: #1e40af;
-        }
-        .delete-btn {
-            background: #e11d48;
-            color: #fff;
-        }
-        .delete-btn:hover {
-            background: #be123c;
         }
         /* Popup modal styles */
         .modal {
@@ -161,22 +140,49 @@
         .modal-form .submit-btn:hover {
             background: #1e40af;
         }
+        
         @media (max-width: 900px) {
             .container { max-width: 98%; padding: 15px 4px; }
             table { font-size: 15px; }
             th, td { padding: 7px 5px; }
-            .action-btn { font-size: 13px; padding: 7px 12px; }
             .modal-content { max-width: 99%; padding: 12px 8px 18px 8px;}
             .modal-form label, .modal-form input, .modal-form textarea, .modal-form select {
                 font-size: 15px;
             }
         }
     </style>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/admin-style.css" />
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css" />
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/cart.css" />
 </head>
 <body>
+
+	<%
+		if (successMessage != null) {
+	%>
+		<div id="toast-success"><%= successMessage %></div>
+	<%
+		}
+	%>
+	
+	<%
+		if (errorMessage != null) {
+			
+	%>
+    	<div id="toast-error"><%=errorMessage %></div>
+	<%
+		}
+	%>
+	<div class="sidebar">
+        <h2>Welcome, <%= admin.getAdmin_username() %></h2>
+        <a href="<%=request.getContextPath()%>/admin/home">Dashboard</a>
+        <a href="<%=request.getContextPath()%>/admin/products">Manage Products</a>
+        <a href="<%=request.getContextPath()%>/admin/orders">Manage Orders</a>
+        <a href="<%=request.getContextPath()%>/admin/reports">Manage Reports</a>
+    </div>
     <div class="container">
         <h2>All Products</h2>
-        <button class="add-btn" onclick="openModal('add')">Add Product</button>
+        <button class="browse-all-btn" onclick="openModal(this)" form-type="add">Add Product</button>
         <table>
             <thead>
                 <tr>
@@ -190,138 +196,154 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Example product rows (replace with dynamic content as needed) -->
-                <tr>
-                    <td>1</td>
-                    <td>Intel Core i7 12700K</td>
-                    <td>Processor</td>
-                    <td>$319.99</td>
-                    <td>8</td>
-                    <td>
-                        <img src="https://via.placeholder.com/60x60?text=CPU" style="border-radius:6px;">
-                    </td>
-                    <td>
-                        <button class="action-btn edit-btn" onclick="openModal('edit', 1)">Edit</button>
-                        <button class="action-btn delete-btn">Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Kingston Fury 16GB DDR5</td>
-                    <td>RAM</td>
-                    <td>$89.99</td>
-                    <td>3</td>
-                    <td>
-                        <img src="https://via.placeholder.com/60x60?text=RAM" style="border-radius:6px;">
-                    </td>
-                    <td>
-                        <button class="action-btn edit-btn" onclick="openModal('edit', 2)">Edit</button>
-                        <button class="action-btn delete-btn">Delete</button>
-                    </td>
-                </tr>
-                <!-- More product rows here -->
+                 <% for (Product product : products) { %>
+                	<tr>
+                		<td><%= product.getProduct_id() %></td>
+                		<td><%= product.getProduct_name() %></td>
+                		<td><%= product.getCategory().getCategory_name() %></td>
+                		<td>₹ <%= product.getPrice() %></td>
+                		<td><%= product.getStock_quantity() %></td>
+                		<td><img width="80px" height="80px" src="<%=request.getContextPath()%>/<%=product.getProduct_img()%>" alt=<%=product.getProduct_name() %>></td>
+                		<td style="display:flex; gap:10px; flex-direction:column; align-item:center;">
+                			<button class="browse-all-btn" 
+                					product-id="<%= product.getProduct_id() %>"
+                					product-name="<%= product.getProduct_name() %>"
+                					product-description="<%= product.getDescription() %>"
+                					product-price = "<%= product.getPrice() %>"
+                					product-stock="<%= product.getStock_quantity() %>"
+                					product-category="<%= product.getCategory().getCategory_id() %>"
+                					product-img="<%=request.getContextPath() %>/<%=product.getProduct_img() %>"
+                					form-type="update"
+                					onclick="openModal(this)">
+                					Edit
+                			</button>
+	                		 <form class="remove-cart-form" action="<%=request.getContextPath() %>/admin/product/delete" method="post">
+	                    		<input type="hidden" name="product-id" value="<%= product.getProduct_id()%>">
+	                       		<button type="submit" class="btn-remove-cart">Delete</button>
+	                   		 </form>
+                		</td>
+                	</tr>
+                <% } %>
             </tbody>
         </table>
     </div>
 
     <!-- Popup Modal -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3 id="modal-title" style="margin-bottom:22px;">Add / Edit Product</h3>
-            <form class="modal-form" id="productForm">
-                <label for="product_name">Product Name *</label>
-                <input type="text" id="product_name" name="product_name" maxlength="150" required>
+    <div id="modal" class="modal" style="display:none;" >
+        	<div class="modal-content">
+        	<span class="close" onclick="closeModal()">&times;</span>
+        	<h3 id="modal-title" style="margin-bottom:22px;">Edit Product</h3>
+        	<form class="modal-form" id="productForm" action="<%=request.getContextPath() %>/admin/product/update" method="post" enctype="multipart/form-data">
+        		<input id="product-id" name="product-id" type="hidden">
+        		
+                <label for="product-name">Product Name *</label>
+                <input type="text" id="product-name" name="product-name" maxlength="150" required>
 
-                <label for="description">Description</label>
-                <textarea id="description" name="description"></textarea>
+                <label for="product-description">Description</label>
+                <textarea id="product-description" name="product-description"></textarea>
 
-                <label for="price">Price *</label>
-                <input type="number" id="price" name="price" min="0" step="0.01" required>
+                <label for="product-price">Price *</label>
+                <input type="number" id="product-price" name="product-price" min="0" step="0.01" required>
 
-                <label for="stock_quantity">Stock Quantity *</label>
-                <input type="number" id="stock_quantity" name="stock_quantity" min="0" required>
+                <label for="stock-quantity">Stock Quantity *</label>
+                <input type="number" id="stock-quantity" name="stock-quantity" min="0" required>
 
-                <label for="category_id">Category</label>
-                <select id="category_id" name="category_id">
+                <label for="category-id">Category</label>
+                <select id="category-id" name="category-id">
                     <option value="">Select Category</option>
-                    <option value="processor">Processor</option>
-                    <option value="ram">RAM</option>
-                    <option value="motherboard">Motherboard</option>
-                    <!-- Add more categories as needed -->
+                	<% for (Category category: categories) { %>
+                    	<option value="<%=category.getCategory_id()%>"><%=category.getCategory_name() %></option>
+                    <% } %>
                 </select>
 
-                <label for="product_img">Product Image</label>
-                <input type="file" id="product_img" name="product_img" accept="image/*" onchange="previewImage(event)">
+                <label for="product-img">Product Image</label>
+                <input type="file" id="product-img" name="product-img" accept="image/*" onchange="previewImage(event)">
                 <img id="imgPreview" class="img-preview" src="#" alt="Image Preview">
 
-                <button type="submit" class="submit-btn" id="modal-submit">Save Product</button>
+                <button type="submit" class="browse-all-btn" id="modal-submit">Save Product</button>
             </form>
         </div>
-    </div>
+       </div>	
+       
     <script>
         // Modal controls
-        function openModal(type, productId) {
-            document.getElementById('modal').style.display = "block";
-            document.getElementById('productForm').reset();
-            document.getElementById('imgPreview').style.display = 'none';
-            if(type === 'add') {
-                document.getElementById('modal-title').textContent = "Add Product";
-                document.getElementById('modal-submit').textContent = "Add Product";
-            } else {
-                document.getElementById('modal-title').textContent = "Edit Product";
-                document.getElementById('modal-submit').textContent = "Update Product";
-                // Demo: Fill with example data for editing (replace with real data in integration)
-                if(productId === 1) {
-                    document.getElementById('product_name').value = "Intel Core i7 12700K";
-                    document.getElementById('description').value = "High performance CPU for gaming and productivity.";
-                    document.getElementById('price').value = "319.99";
-                    document.getElementById('stock_quantity').value = "8";
-                    document.getElementById('category_id').value = "processor";
-                    document.getElementById('imgPreview').src = "https://via.placeholder.com/80x80?text=CPU";
-                    document.getElementById('imgPreview').style.display = 'block';
-                } else if(productId === 2) {
-                    document.getElementById('product_name').value = "Kingston Fury 16GB DDR5";
-                    document.getElementById('description').value = "Fast DDR5 RAM for next-gen PCs.";
-                    document.getElementById('price').value = "89.99";
-                    document.getElementById('stock_quantity').value = "3";
-                    document.getElementById('category_id').value = "ram";
-                    document.getElementById('imgPreview').src = "https://via.placeholder.com/80x80?text=RAM";
-                    document.getElementById('imgPreview').style.display = 'block';
-                }
+       function openModal(button) {
+    	const imgPath = button.getAttribute("product-img");
+    	const form = document.getElementById("productForm");
+    	
+    	if (button.getAttribute("form-type")==="add") {
+    		form.setAttribute("action","<%=request.getContextPath()%>/admin/product/add");
+    	}else{
+    		form.setAttribute("action","<%=request.getContextPath()%>/admin/product/update");
+    		
+    		document.getElementById('product-id').value = button.getAttribute('product-id');
+            document.getElementById('product-name').value = button.getAttribute('product-name');
+            document.getElementById('product-description').value = button.getAttribute('product-description');
+            document.getElementById('product-price').value = button.getAttribute('product-price');
+            document.getElementById('stock-quantity').value = button.getAttribute('product-stock');
+            document.getElementById('category-id').value = button.getAttribute('product-category');
+            
+    	}
+    	
+        document.getElementById('modal').style.display = "block";
+        document.getElementById('imgPreview').style.display = 'none';
+        
+        const imgPreview = document.getElementById("imgPreview");
+        if (imgPath && imgPath.trim() !== "") {
+            imgPreview.src = imgPath;
+            imgPreview.style.display = "block";
+        } else {
+            imgPreview.src = "#";
+            imgPreview.style.display = "none";
+        }
+        
+    }
+        
+    function closeModal() {
+        document.getElementById('modal').style.display = "none";
+    }
+    // Image preview
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('imgPreview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
             }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = "#";
+            preview.style.display = 'none';
         }
-        function closeModal() {
-            document.getElementById('modal').style.display = "none";
-        }
-        // Image preview
-        function previewImage(event) {
-            const input = event.target;
-            const preview = document.getElementById('imgPreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.src = "#";
-                preview.style.display = 'none';
-            }
-        }
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('modal');
-            if (event.target == modal) closeModal();
-        }
-        // Demo form submit
-        document.getElementById('productForm').onsubmit = function(e) {
-            e.preventDefault();
-            // Collect and process form data here
-            alert('Product saved (demo; integrate backend as needed)');
-            closeModal();
-        }
+    }
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal');
+        if (event.target == modal) closeModal();
+    }
+    
+    
+    <% if (successMessage != null) { %>
+		var successtoast = document.getElementById("toast-success");
+		successtoast.className = "show";
+		successtoast.style.visibility = "visible";
+		setTimeout(function(){
+			successtoast.className = successtoast.className.replace("show", "");
+			successtoast.style.visibility = "hidden"
+		}, 6000);
+	<% } %>
+	
+	<% if (errorMessage != null) { %>
+		var errortoast = document.getElementById("toast-error");
+		errortoast.className = "show";
+		errortoast.style.visibility = "visible";
+		setTimeout(function(){
+			errortoast.className = errortoast.className.replace("show", ""); 
+			errortoast.style.visibility = "hidden";
+		}, 6000);
+	<% } %>
     </script>
 </body>
 </html>

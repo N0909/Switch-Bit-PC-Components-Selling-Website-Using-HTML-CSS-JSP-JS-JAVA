@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.annotation.*;
 
 import com.switchbit.service.UserService;
 import com.switchbit.model.User;
@@ -25,6 +26,8 @@ import com.switchbit.model.Password;
  * 3. On success → set success message in session and redirect to change-password.jsp
  * 4. On failure → set error message in session and redirect to change-password.jsp
  */
+
+@WebServlet("/user/updatepassword")
 public class UpdatePasswordServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private UserService userService;

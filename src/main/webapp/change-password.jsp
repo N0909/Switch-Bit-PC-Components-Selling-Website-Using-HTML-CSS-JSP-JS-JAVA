@@ -35,7 +35,7 @@
                 <li><a href="<%=request.getContextPath()%>/about.jsp">About</a></li>
                 <li class="active"><a href="<%=request.getContextPath() %>/profile.jsp">My Account</a></li>
                 <li><a href="<%=request.getContextPath()%>/product/products">Products</a></li>
-                <li><a href="<%=request.getContextPath()%>/contact.jsp">Contact</a></li>
+                <li><a href="<%=request.getContextPath()%>/report.jsp">Report</a></li>
             </ul>
         </nav>
         <div class="side-container">
@@ -50,6 +50,10 @@
             <div class="dropdown-item">
               <span class="dropdown-icon">📦</span>
               <span>Your Orders</span>
+            </div>
+            <div class="dropdown-item">
+              <span class="dropdown-icon">💬</span>
+              <span>Submitted Reports</span>
             </div>
             <div class="dropdown-item">
               <span class="dropdown-icon">⚙️</span>
@@ -134,67 +138,22 @@
         </div>
     </main>
     
+    <% if (user!=null) {%>
+	    <script src="<%=request.getContextPath()%>/js/profile-dropdown.js"></script> 
+    <% } %>
+    
+    <% if (successMessage != null) { %>
+		<script src="<%=request.getContextPath()%>/js/successMessage.js" ></script>
+	<% } %>
+	
+	<% if (errorMessage != null) { %>
+		<script src="<%=request.getContextPath()%>/js/errorMessage.js" ></script>
+	<% } %>
+    
     <script>
-    // Profile dropdown functionality (only if user is logged in)
-    document.addEventListener('DOMContentLoaded', function() {
-      <% if (user != null) { %>
-      const profileTrigger = document.querySelector('.profile-trigger');
-      const profileDropdown = document.querySelector('.profile-dropdown');
-      const accountContainer = document.querySelector('.account-container');
-      
-      if (profileTrigger && profileDropdown && accountContainer) {
-        // Toggle dropdown on click
-        profileTrigger.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const isVisible = profileDropdown.style.opacity === '1';
-          
-          if (isVisible) {
-            profileDropdown.style.opacity = '0';
-            profileDropdown.style.visibility = 'hidden';
-            profileDropdown.style.transform = 'translateY(-10px)';
-          } else {
-            profileDropdown.style.opacity = '1';
-            profileDropdown.style.visibility = 'visible';
-            profileDropdown.style.transform = 'translateY(0)';
-          }
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-          if (!accountContainer.contains(e.target)) {
-            profileDropdown.style.opacity = '0';
-            profileDropdown.style.visibility = 'hidden';
-            profileDropdown.style.transform = 'translateY(-10px)';
-          }
-        });
-        
-        // Handle dropdown item clicks
-        const dropdownItems = document.querySelectorAll('.dropdown-item');
-        dropdownItems.forEach(item => {
-          item.addEventListener('click', function() {
-            const text = this.querySelector('span:last-child').textContent;
-            
-            // Handle different actions
-            if (text === 'Your Orders') {
-              window.location.href = '<%= request.getContextPath() %>/orders.jsp';
-            } else if (text === 'Manage Account') {
-              window.location.href = '<%= request.getContextPath() %>/profile.jsp';
-            } else if (text === 'Logout') {
-              if (confirm('Are you sure you want to logout?')) {
-                window.location.href = '<%= request.getContextPath() %>/user/logout';
-              }
-            }
-            
-            // Close dropdown after action
-            profileDropdown.style.opacity = '0';
-            profileDropdown.style.visibility = 'hidden';
-            profileDropdown.style.transform = 'translateY(-10px)';
-          });
-        });
-      }
-      <% } %>
-      
-      
+    
+	  const contextPath = "<%= request.getContextPath() %>" ;
+
       const oldpasswordToggle = document.getElementById('old-passwordToggle');
       const newpasswordToggle = document.getElementById('new-passwordToggle');
       const newpasswordInput = document.getElementById('new-password');
@@ -273,26 +232,6 @@
             }
         });
       
-      
-      	<% if (successMessage != null) { %>
-			var successtoast = document.getElementById("toast-success");
-			successtoast.className = "show";
-			successtoast.style.visibility = "visible";
-			setTimeout(function(){
-				successtoast.className = successtoast.className.replace("show", "");
-				successtoast.style.visibility = "hidden"
-			}, 6000);
-		<% } %>
-	
-		<% if (errorMessage != null) { %>
-			var errortoast = document.getElementById("toast-error");
-			errortoast.className = "show";
-			errortoast.style.visibility = "visible";
-			setTimeout(function(){
-				errortoast.className = errortoast.className.replace("show", ""); 
-				errortoast.style.visibility = "hidden";
-			}, 6000);
-		<% } %>
     });
     </script>
 </div>

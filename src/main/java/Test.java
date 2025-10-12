@@ -12,6 +12,11 @@ import com.switchbit.util.*;
 
 public class Test {
 	public static void main(String[] args) {
-		System.out.println(System.getenv("DB_URL"));
+		
+		try {
+			System.out.println(DBConnection.getConnection());
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
 	}
 }

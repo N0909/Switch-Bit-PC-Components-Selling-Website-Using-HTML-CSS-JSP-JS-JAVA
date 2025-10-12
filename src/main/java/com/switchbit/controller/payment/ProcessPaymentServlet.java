@@ -13,10 +13,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.*;
 /**
  * Servlet implementation class ProcessPaymentServlet
  */
 
+@WebServlet("/payment/processpayment")
 public class ProcessPaymentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private OrderService orderService;

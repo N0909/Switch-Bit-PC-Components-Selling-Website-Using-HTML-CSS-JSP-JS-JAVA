@@ -18,9 +18,12 @@ public class User {
 	
 	// Default Constructor
 	public User() {}
-	
+
 	// Argument Constructor
-	public User(String userId, String userName, String userEmail, String userPhone, String userAddress,
+	public User(String userId, 
+			String userName, 
+			String userEmail,
+			String userPhone, 			String userAddress,
 			Timestamp reg_date) {
 		this.userId = userId;
 		this.userName = userName;
@@ -82,10 +85,11 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User [userId=" + userId + ", userName=" + userName + ", userEmail=" + userEmail + ", userPhone="
-				+ userPhone + ", userAddress=" + userAddress + ", reg_date=" + reg_date + "]";
+		return "User [userId=" + userId 
+				+ ", userName=" + userName 
+				+ ", userEmail=" + userEmail 
+				+ ", userPhone=" + userPhone 
+				+ ", userAddress=" + userAddress 
+				+ ", reg_date=" + reg_date + "]";
 	}
-	
-	
-	
 }

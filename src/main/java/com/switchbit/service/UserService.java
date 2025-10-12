@@ -18,6 +18,16 @@ public class UserService {
 	public UserService() {
 		this.userDAO = new UserDAO();
 	}
+	
+	public User getUser(String user_id) throws DataAccessException {
+		User user = null;
+		try(Connection conn = DBConnection.getConnection()){
+			user = userDAO.getUser(conn, user_id).getUser();
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to getUser", e);
+		}
+		return user;
+	}
 
 	/**
 	 * Adds a new user into the system.

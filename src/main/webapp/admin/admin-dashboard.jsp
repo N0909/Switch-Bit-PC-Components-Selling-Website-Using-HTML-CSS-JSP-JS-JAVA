@@ -11,7 +11,9 @@
 	}
 	
 	String errorMessage = (String) session.getAttribute("errorMessage");
+	String successMessage = (String) session.getAttribute("successMessage");
 	session.removeAttribute("errorMessage");
+	session.removeAttribute("successMessage");
 	
 	
 	List<Product> lowStockProduct = (List<Product>) request.getAttribute("low-stock-product");
@@ -25,186 +27,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard - SwitchBit</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f4f6f8;
-        }
-        .sidebar {
-            height: 100vh;
-            width: 220px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background: #23272b;
-            color: #fff;
-            padding-top: 30px;
-        }
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .sidebar a {
-            display: block;
-            color: #fff;
-            padding: 15px 30px;
-            text-decoration: none;
-            font-size: 17px;
-        }
-        .sidebar a:hover {
-            background: #374151;
-        }
-        .main-content {
-            margin-left: 240px;
-            padding: 30px;
-        }
-        .card-container {
-            display: flex;
-            gap: 30px;
-        }
-        .card {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            flex: 1;
-            text-align: center;
-            padding: 35px 0;
-            font-size: 22px;
-        }
-        .card-title {
-            font-size: 18px;
-            color: #888;
-            margin-bottom: 10px;
-        }
-        .low-stock-table {
-            width: 60%;
-            margin-top: 40px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            padding: 20px;
-            font-size: 17px;
-            text-align: center;
-        }
-        .low-stock-table th, .low-stock-table td {
-            padding: 10px 14px;
-        }
-        .low-stock-table th {
-            background: #f5f5f5;
-        }
-        .low-stock-table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .action-btn {
-            border: none;
-            border-radius: 6px;
-            padding: 9px 18px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            margin-right: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            transition: background 0.2s;
-        }
-        .edit-btn {
-            background: #2563eb;
-            color: #fff;
-        }
-        .edit-btn:hover {
-            background: #1e40af;
-        }
-        /* Popup modal styles */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 999; 
-            left: 0; top: 0; width: 100%; height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.35); 
-        }
-        .modal-content {
-            background-color: #fff;
-            margin: 90px auto;
-            padding: 35px 30px 30px 30px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 470px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.16);
-            position: relative;
-        }
-        .close {
-            color: #aaa;
-            position: absolute;
-            right: 18px;
-            top: 18px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover { color: #e11d48; }
-        .modal-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .modal-form label {
-            font-size: 16px;
-            margin-bottom: 4px;
-            color: #23272b;
-        }
-        .modal-form input, .modal-form textarea, .modal-form select {
-            padding: 9px;
-            border-radius: 6px;
-            border: 1px solid #d1d5db;
-            font-size: 16px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .modal-form textarea {
-            min-height: 60px;
-            resize: vertical;
-        }
-        .modal-form input[type="file"] {
-            padding: 4px;
-        }
-        .modal-form .img-preview {
-            margin-top: 6px;
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 7px;
-            border: 1px solid #cbd5e1;
-            display: none;
-        }
-        .modal-form .submit-btn {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 0;
-            font-size: 18px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 8px;
-        }
-        .modal-form .submit-btn:hover {
-            background: #1e40af;
-        }
-        @media (max-width: 900px) {
-            .main-content { margin-left: 0; }
-            .card-container { flex-direction: column; }
-            .low-stock-table { width: 100%; }
-            .sidebar { width: 100%; height: auto; position: static; }
-        }
-    </style>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/admin-style.css" />
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css" />
 </head>
 <body>
     <div class="sidebar">
         <h2>Welcome, <%= admin.getAdmin_username() %></h2>
-        <a href="#">Manage Products</a>
-        <a href="#">Manage Orders</a>
+        <a href="<%=request.getContextPath()%>/admin/home">Dashboard</a>
+        <a href="<%=request.getContextPath()%>/admin/products">Manage Products</a>
+        <a href="<%=request.getContextPath()%>/admin/orders">Manage Orders</a>
+        <a href="<%=request.getContextPath()%>/admin/reports">Manage Reports</a>
     </div>
     <div class="main-content">
         <div class="card-container">
@@ -340,6 +172,28 @@
         const modal = document.getElementById('modal');
         if (event.target == modal) closeModal();
     }
+    
+    <% if (successMessage != null) { %>
+	var successtoast = document.getElementById("toast-success");
+	successtoast.className = "show";
+	successtoast.style.visibility = "visible";
+	setTimeout(function(){
+		successtoast.className = successtoast.className.replace("show", "");
+		successtoast.style.visibility = "hidden"
+	}, 6000);
+<% } %>
+
+<% if (errorMessage != null) { %>
+	var errortoast = document.getElementById("toast-error");
+	errortoast.className = "show";
+	errortoast.style.visibility = "visible";
+	setTimeout(function(){
+		errortoast.className = errortoast.className.replace("show", ""); 
+		errortoast.style.visibility = "hidden";
+	}, 6000);
+<% } %>
+    
+    
     </script>
 </body>
 </html>

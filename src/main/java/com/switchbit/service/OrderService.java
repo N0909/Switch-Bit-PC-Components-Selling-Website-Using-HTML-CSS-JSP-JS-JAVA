@@ -34,7 +34,27 @@ public class OrderService {
         try (Connection conn = DBConnection.getConnection()) {
             orders = order_dao.getOrders(conn, user);
         } catch (SQLException e) {
-            throw new DataAccessException("failed to fetch orders");
+            throw new DataAccessException("failed to fetch orders",e);
+        }
+        return orders;
+    }
+    
+    public List<Order> getOrders(String order_status) throws DataAccessException {
+        List<Order> orders = new ArrayList<Order>();
+        try (Connection conn = DBConnection.getConnection()) {
+            orders = order_dao.getOrders(conn, order_status);
+        } catch (SQLException e) {
+            throw new DataAccessException("failed to fetch orders",e);
+        }
+        return orders;
+    }
+    
+    public List<Order> getOrders() throws DataAccessException {
+        List<Order> orders = new ArrayList<Order>();
+        try (Connection conn = DBConnection.getConnection()) {
+            orders = order_dao.getOrders(conn);
+        } catch (SQLException e) {
+            throw new DataAccessException("failed to fetch orders",e);
         }
         return orders;
     }
@@ -207,12 +227,13 @@ public class OrderService {
     	}
     }
     
-    public void updateDeliveryDate(String order_id, Date date) throws RollBackException, DataAccessException, CloseConnectionException {
+    public void updateOrder(String order_id, Date date, String order_status) throws RollBackException, DataAccessException, CloseConnectionException {
     	Connection conn = null;
     	try {
     		conn = DBConnection.getConnection();
     		conn.setAutoCommit(false);
     		order_dao.updateDeliveryDate(conn, order_id, date);
+    		order_dao.updateOrderStatus(conn, order_id, order_status);
     		conn.commit();
     	}catch(SQLException e) {
     		if (conn!=null) {
@@ -221,7 +242,7 @@ public class OrderService {
 				} catch (SQLException e1) {
 					throw new RollBackException("failed to rollback transaction");
 				}
-    			throw new DataAccessException("failed to update delivery date");
+    			throw new DataAccessException("failed to update order");
     		}
     	}finally{
     		if (conn!=null) {
@@ -233,6 +254,14 @@ public class OrderService {
     		}
     	}
     	
+    }
+    
+    public OrderDetailsDTO getOrderDetails(String order_id) throws DataAccessException{
+    	try (Connection conn = DBConnection.getConnection()){
+    		return order_dao.getOrderDetails(conn, order_id);
+    	}catch(SQLException e) {
+    		throw new DataAccessException("failed to retreive details",e);
+    	}
     }
 
 }

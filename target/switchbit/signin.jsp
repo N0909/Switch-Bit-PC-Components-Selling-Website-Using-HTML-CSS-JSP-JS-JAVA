@@ -1,6 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="com.switchbit.util.PaginatedResult" %>
 <%@ page import="com.switchbit.model.*" %>
 <%
 	String successMessage = (String) session.getAttribute("successMessage");
